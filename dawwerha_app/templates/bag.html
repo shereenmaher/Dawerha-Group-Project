@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Recycling bag{% endblock %}
+
+{% block navbar_right %}
+    <a href="{% url 'bag' %}" class="btn btn-success">
+        <i class="bi bi-bag"></i> Recycling bag (3)
+    </a>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="row g-3">
+
+        <!-- Items -->
+        <div class="col-lg-8">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <div class="d-flex align-items-center gap-3">
+                    <span class="bg-success text-white rounded-3 p-2 fs-3 lh-1">
+                        <i class="bi bi-bag"></i>
+                    </span>
+
+                    <h1 class="h2 fw-bold mb-0">
+                        Recycling bag
+                    </h1>
+                </div>
+
+                <a href="{% url 'scan' %}" class="btn btn-outline-success">
+                    <i class="bi bi-plus-lg"></i> Scan another item
+                </a>
+
+            </div>
+
+            <!-- Water bottles -->
+            <div class="card mb-2">
+                <div class="card-body d-flex align-items-center gap-3">
+
+                    <span class="bg-success-subtle text-success rounded-3 p-3 fs-4 lh-1">
+                        <i class="bi bi-recycle"></i>
+                    </span>
+
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">
+                            Water bottles ×20
+                        </div>
+
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">
+                            PET plastic
+                        </span>
+                    </div>
+
+                    <div class="text-end me-2">
+                        <div class="small text-body-secondary">
+                            Est. weight
+                        </div>
+
+                        <div class="fw-bold">
+                            0.6 kg
+                        </div>
+                    </div>
+
+                    <button type="button"
+                            class="btn btn-outline-danger btn-sm"
+                            aria-label="Remove item">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Cardboard boxes -->
+            <div class="card mb-2">
+                <div class="card-body d-flex align-items-center gap-3">
+
+                    <span class="bg-success-subtle text-success rounded-3 p-3 fs-4 lh-1">
+                        <i class="bi bi-recycle"></i>
+                    </span>
+
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">
+                            Cardboard boxes
+                        </div>
+
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">
+                            Paper and cardboard
+                        </span>
+                    </div>
+
+                    <div class="text-end me-2">
+                        <div class="small text-body-secondary">
+                            Est. weight
+                        </div>
+
+                        <div class="fw-bold">
+                            3 kg
+                        </div>
+                    </div>
+
+                    <button type="button"
+                            class="btn btn-outline-danger btn-sm"
+                            aria-label="Remove item">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Cola cans -->
+            <div class="card mb-2">
+                <div class="card-body d-flex align-items-center gap-3">
+
+                    <span class="bg-success-subtle text-success rounded-3 p-3 fs-4 lh-1">
+                        <i class="bi bi-recycle"></i>
+                    </span>
+
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">
+                            Cola cans ×15
+                        </div>
+
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">
+                            Aluminium
+                        </span>
+                    </div>
+
+                    <div class="text-end me-2">
+                        <div class="small text-body-secondary">
+                            Est. weight
+                        </div>
+
+                        <div class="fw-bold">
+                            0.2 kg
+                        </div>
+                    </div>
+
+                    <button type="button"
+                            class="btn btn-outline-danger btn-sm"
+                            aria-label="Remove item">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+                </div>
+            </div>
+
+            <p class="small text-body-secondary">
+                Weights are estimates. The collector pays you in cash based on the real weight.
+            </p>
+
+        </div>
+
+        <!-- Summary -->
+        <div class="col-lg-4">
+
+            <div class="card">
+                <div class="card-body p-4">
+
+                    <div class="text-center text-success display-1 mb-2">
+                        <i class="bi bi-bag-check"></i>
+                    </div>
+
+                    <h2 class="h5 fw-bold">
+                        Summary
+                    </h2>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-body-secondary">
+                            Total weight
+                        </span>
+
+                        <strong>
+                            3.8 kg
+                        </strong>
+                    </div>
+
+                    <div class="bg-body-secondary rounded-3 p-3 mb-3">
+
+                        <div class="small fw-semibold mb-2">
+                            Home pickup unlocks at 5 kg
+                        </div>
+
+                        <div class="progress mb-1"
+                             role="progressbar"
+                             aria-label="Bag progress"
+                             aria-valuenow="76"
+                             aria-valuemin="0"
+                             aria-valuemax="100"
+                             style="height: 8px;">
+
+                            <div class="progress-bar bg-success"
+                                 style="width: 76%">
+                            </div>
+
+                        </div>
+
+                        <div class="small">
+                            1.2 kg to go
+                        </div>
+
+                    </div>
+
+                    <a href="{% url 'sites' %}"
+                       class="btn btn-success w-100 mb-2">
+                        <i class="bi bi-geo-alt"></i> I'll drop it off myself
+                    </a>
+
+                    <a href="{% url 'pickup' %}"
+                       class="btn btn-outline-success w-100">
+                        <i class="bi bi-truck"></i> Request a pickup
+                    </a>
+
+                    <p class="small text-body-secondary mt-2 mb-0">
+                        [The pickup button looks locked until the bag reaches 5 kg, with a short message explaining why.]
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
