@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="text-white py-5" style="background: linear-gradient(90deg, rgba(20,83,45,.4), rgba(20,83,45,.95) 55%), url('{% static "img/hero.jpg" %}') center / cover, #14532d;">
+    <div class="container-fluid px-4">
+        <div class="row">
+            <div class="col-lg-5 offset-lg-6 py-lg-5">
+                <span class="badge rounded-pill text-bg-warning mb-3">
+                    <i class="bi bi-exclamation-circle me-1"></i> Our rivers are filling up with waste
+                </span>
+                <h1 class="display-5 fw-bold mb-3">Before you throw it away, snap it.</h1>
+                <p class="lead mb-4">
+                    Plastic, cans and cardboard end up in our rivers and streets, even though they're worth money.
+                    Dawwerha uses AI to tell you what your item is made of and whether it can be recycled,
+                    then connects you with a local collector who will buy it.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'scan' %}" class="btn btn-success btn-lg">
+                        <i class="bi bi-camera me-1"></i> Scan your item
+                    </a>
+                    <a href="{% url 'sites' %}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-geo-alt me-1"></i> See recycling sites
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="container py-5">
+    <!-- Stats -->
+    <div class="row g-3 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <span class="bg-success-subtle text-success rounded-3 p-2 fs-4 lh-1"><i class="bi bi-tree"></i></span>
+                    <div>
+                        <div class="fs-3 fw-bold text-success-emphasis lh-1">[000] kg</div>
+                        <div class="small text-body-secondary">recycled instead of dumped</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <span class="bg-info-subtle text-info-emphasis rounded-3 p-2 fs-4 lh-1"><i class="bi bi-geo-alt"></i></span>
+                    <div>
+                        <div class="fs-3 fw-bold text-success-emphasis lh-1">[00]</div>
+                        <div class="small text-body-secondary">collectors and recycling sites</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <span class="bg-warning-subtle text-warning-emphasis rounded-3 p-2 fs-4 lh-1"><i class="bi bi-truck"></i></span>
+                    <div>
+                        <div class="fs-3 fw-bold text-success-emphasis lh-1">[000]</div>
+                        <div class="small text-body-secondary">pickups completed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- How it works -->
+    <h2 class="text-center fw-bold mb-4">How does it work?</h2>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 overflow-hidden">
+                <div class="bg-success-subtle text-success text-center py-4 display-4"><i class="bi bi-phone"></i></div>
+                <div class="card-body">
+                    <span class="badge rounded-pill text-bg-success mb-2">1</span>
+                    <h3 class="h5 fw-bold">Snap</h3>
+                    <p class="small mb-0">Take a photo of the item or upload one.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 overflow-hidden">
+                <div class="bg-primary-subtle text-primary text-center py-4 display-4"><i class="bi bi-card-text"></i></div>
+                <div class="card-body">
+                    <span class="badge rounded-pill text-bg-success mb-2">2</span>
+                    <h3 class="h5 fw-bold">Learn</h3>
+                    <p class="small mb-0">The material type, whether it's recyclable, and its approximate price.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 overflow-hidden">
+                <div class="bg-warning-subtle text-warning-emphasis text-center py-4 display-4"><i class="bi bi-truck"></i></div>
+                <div class="card-body">
+                    <span class="badge rounded-pill text-bg-success mb-2">3</span>
+                    <h3 class="h5 fw-bold">Hand it over</h3>
+                    <p class="small mb-0">Take it to the nearest point, or ask someone to pick it up.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- What we accept -->
+    <h2 class="fw-bold mb-3">What do we accept?</h2>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+        <div class="col">
+            <div class="bg-primary-subtle text-primary-emphasis rounded-3 p-3 h-100">
+                <i class="bi bi-cup-straw fs-3"></i>
+                <div class="fw-bold mt-2">Plastic</div>
+                <div class="small">Bottles, containers</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="bg-warning-subtle text-warning-emphasis rounded-3 p-3 h-100">
+                <i class="bi bi-box-seam fs-3"></i>
+                <div class="fw-bold mt-2">Paper and cardboard</div>
+                <div class="small">Boxes, newspapers</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="bg-secondary-subtle text-secondary-emphasis rounded-3 p-3 h-100">
+                <i class="bi bi-database fs-3"></i>
+                <div class="fw-bold mt-2">Metals</div>
+                <div class="small">Cans, iron, copper</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="bg-info-subtle text-info-emphasis rounded-3 p-3 h-100">
+                <i class="bi bi-cup fs-3"></i>
+                <div class="fw-bold mt-2">Glass</div>
+                <div class="small">Jars, bottles</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="bg-danger-subtle text-danger-emphasis rounded-3 p-3 h-100">
+                <i class="bi bi-phone fs-3"></i>
+                <div class="fw-bold mt-2">Electronics</div>
+                <div class="small">Phones, cables</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
