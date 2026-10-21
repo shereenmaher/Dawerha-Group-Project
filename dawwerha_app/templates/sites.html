@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Recycling sites{% endblock %}
+
+{% block navbar_right %}
+    <a href="{% url 'bag' %}" class="btn bg-success-subtle text-success-emphasis">
+        <i class="bi bi-bag"></i> Recycling bag (3)
+    </a>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+    <h1 class="h2 fw-bold mb-1">Recycling sites near you</h1>
+
+    <p class="text-body-secondary mb-4">
+        Take your items to a recycling site yourself. Click a site to see its address, hours and what it accepts.
+    </p>
+
+    <div class="row g-3">
+
+        <!-- Sites list -->
+        <div class="col-lg-4">
+
+            <div class="card border-success border-2 mb-3">
+                <div class="card-body">
+
+                    <div class="d-flex gap-3 mb-2">
+
+                        <span class="bg-success-subtle text-success rounded-3 p-2 fs-5 lh-1">
+                            <i class="bi bi-building"></i>
+                        </span>
+
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">
+                                Ammar Al-Ard Recycling
+                            </div>
+
+                            <div class="small text-body-secondary">
+                                Al-Bireh · [distance] km · Sun–Thu 9:00–4:00
+                            </div>
+                        </div>
+
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis align-self-start">
+                            Open
+                        </span>
+
+                    </div>
+
+                    <p class="small mb-3">
+                        <strong>Accepts:</strong>
+                        Plastic · Cardboard · Metals · Electronics
+                    </p>
+
+                    <a href="#" class="btn btn-success btn-sm">
+                        <i class="bi bi-sign-turn-right"></i> Directions
+                    </a>
+
+                    <button type="button" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-geo-alt"></i> Show on map
+                    </button>
+
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-body">
+
+                    <div class="d-flex gap-3 mb-2">
+
+                        <span class="bg-success-subtle text-success rounded-3 p-2 fs-5 lh-1">
+                            <i class="bi bi-building"></i>
+                        </span>
+
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">
+                                [Recycling center – demo]
+                            </div>
+
+                            <div class="small text-body-secondary">
+                                Nablus · [distance] km · [opening hours]
+                            </div>
+                        </div>
+
+                        <span class="badge rounded-pill text-bg-light border align-self-start">
+                            Closed
+                        </span>
+
+                    </div>
+
+                    <p class="small mb-3">
+                        <strong>Accepts:</strong>
+                        Plastic · Glass
+                    </p>
+
+                    <a href="#" class="btn btn-success btn-sm">
+                        <i class="bi bi-sign-turn-right"></i> Directions
+                    </a>
+
+                    <button type="button" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-geo-alt"></i> Show on map
+                    </button>
+
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-body">
+
+                    <div class="d-flex gap-3 mb-2">
+
+                        <span class="bg-success-subtle text-success rounded-3 p-2 fs-5 lh-1">
+                            <i class="bi bi-building"></i>
+                        </span>
+
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">
+                                [Municipal drop-off point – demo]
+                            </div>
+
+                            <div class="small text-body-secondary">
+                                Nablus · [distance] km · Open daily
+                            </div>
+                        </div>
+
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis align-self-start">
+                            Open
+                        </span>
+
+                    </div>
+
+                    <p class="small mb-3">
+                        <strong>Accepts:</strong>
+                        Paper · Cardboard · Metals
+                    </p>
+
+                    <a href="#" class="btn btn-success btn-sm">
+                        <i class="bi bi-sign-turn-right"></i> Directions
+                    </a>
+
+                    <button type="button" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-geo-alt"></i> Show on map
+                    </button>
+
+                </div>
+            </div>
+
+            <div class="bg-success-subtle rounded-3 p-3 d-flex align-items-center gap-3 small">
+
+                <i class="bi bi-truck fs-4 text-success"></i>
+
+                <span class="flex-grow-1">
+                    Can't go yourself? A collector can pick it up from your home.
+                </span>
+
+                <a href="{% url 'pickup' %}" class="link-success fw-semibold">
+                    Request a pickup
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- Map -->
+        <div class="col-lg-8">
+
+            <div id="map"
+                 class="bg-secondary-subtle rounded-4 border d-flex align-items-center justify-content-center text-body-secondary"
+                 style="min-height: 520px;">
+
+                [Map: recycling sites + your location]
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
