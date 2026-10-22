@@ -37,8 +37,16 @@
                             <label for="cMessage" class="form-label small fw-semibold">Message</label>
                             <textarea class="form-control" id="cMessage" name="message" rows="5" required></textarea>
                         </div>
-                        <p class="text-danger small">[Validation errors appear here]</p>
-                        <button type="submit" class="btn btn-success w-100"><i class="bi bi-send"></i> Send message</button>
+
+                        {% for message in messages %}
+                            {% if message.tags == 'error' %}
+                                <p class="text-danger small mb-1">{{ message }}</p>
+                            {% else %}
+                                <p class="text-success small mb-1">{{ message }}</p>
+                            {% endif %}
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-success w-100 mt-2"><i class="bi bi-send"></i> Send message</button>
                     </form>
                 </div>
             </div>

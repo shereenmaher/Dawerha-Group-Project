@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import ContactMessage
 
 
 # ===== Dina =====
@@ -41,4 +43,17 @@ def about(request):
 
 
 def contact(request):
+    if request.method == "POST":
+        errors = ContactMessage.objects.contact_validator(request.POST)
+        if errors:
+            for key, value in errors.items():
+                messages.error(request, value)
+            return redirect('/contact/')
+        ContactMessage.objects.create(
+            name=request.POST['name'],
+            email=request.POST['email'],
+            message=request.POST['message'],
+        )
+        messages.success(request, "Your message was sent successfully")
+        return redirect('/contact/')
     return render(request, "contact.html")
