@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Scan your item{% endblock %}
 
 {% block navbar_right %}
-    <a href="{% url 'bag' %}" class="btn bg-success-subtle text-success-emphasis">
-        <i class="bi bi-bag"></i> Recycling bag (3)
-    </a>
+<a href="{% url 'bag' %}" class="btn bg-success-subtle text-success-emphasis">
+    <i class="bi bi-bag"></i> Recycling bag
+</a>
 {% endblock %}
 
 {% block content %}
@@ -24,44 +25,56 @@
         </div>
     </div>
 
+    {% csrf_token %}
+
     <div class="row g-3">
 
         <!-- Upload -->
         <div class="col-lg-6">
 
-            <label for="photoInput"
-                   class="d-flex flex-column align-items-center justify-content-center text-center bg-success-subtle border border-2 border-success rounded-4 p-5 mb-3"
-                   style="border-style: dashed !important; min-height: 300px; cursor: pointer;">
+            <label
+                for="photoInput"
+                class="d-flex flex-column align-items-center justify-content-center text-center bg-success-subtle border border-2 border-success rounded-4 p-4 mb-3"
+                style="border-style: dashed !important; min-height: 300px; cursor: pointer;"
+            >
+                <img
+                    id="preview"
+                    class="img-fluid rounded-3 d-none"
+                    style="max-height: 260px;"
+                    alt="Your photo"
+                >
 
-                <i class="bi bi-camera-fill text-success display-1"></i>
-
-                <span class="fw-bold text-success-emphasis mt-2">
-                    [Image preview]
-                </span>
-
-                <span class="small mt-1">
-                    Drag the photo here or choose one from your device
-                </span>
+                <div id="uploadText">
+                    <i class="bi bi-camera-fill text-success display-1"></i>
+                    <p class="fw-bold text-success-emphasis mt-2 mb-1">
+                        Choose a photo
+                    </p>
+                    <p class="small mb-0">
+                        Drag the photo here or choose one from your device
+                    </p>
+                </div>
             </label>
 
-            <input type="file"
-                   id="photoInput"
-                   name="image"
-                   accept="image/*"
-                   class="d-none">
+            <input
+                type="file"
+                id="photoInput"
+                accept="image/*"
+                class="d-none"
+            >
+
+            <input
+                type="file"
+                id="cameraInput"
+                accept="image/*"
+                capture="environment"
+                class="d-none"
+            >
 
             <div class="row g-2">
-
                 <div class="col-6">
                     <label for="cameraInput" class="btn btn-success w-100">
                         <i class="bi bi-camera"></i> Open camera
                     </label>
-
-                    <input type="file"
-                           id="cameraInput"
-                           accept="image/*"
-                           capture="environment"
-                           class="d-none">
                 </div>
 
                 <div class="col-6">
@@ -69,91 +82,84 @@
                         <i class="bi bi-upload"></i> Upload photo
                     </label>
                 </div>
-
             </div>
 
-            <p class="small text-body-secondary mt-2">
-                [Loading state: "Analyzing your photo…" during the Fetch request]
+            <p id="loading" class="text-success fw-semibold mt-3 d-none">
+                <span class="spinner-border spinner-border-sm"></span>
+                Analyzing your photo…
             </p>
+
+            <div id="errorBox" class="alert alert-danger mt-3 d-none"></div>
 
         </div>
 
         <!-- AI result -->
         <div class="col-lg-6">
-
             <div class="card h-100">
                 <div class="card-body p-4">
 
-                    <div class="d-flex align-items-center gap-3 mb-3">
+                    <div id="emptyResult" class="text-center text-body-secondary py-5">
+                        <i class="bi bi-stars display-4 text-success"></i>
+                        <p class="mt-2">
+                            The AI result will show here after you choose a photo.
+                        </p>
+                    </div>
 
-                        <span class="bg-primary-subtle text-primary rounded-3 p-3 display-6 lh-1">
-                            <i class="bi bi-cup-straw"></i>
-                        </span>
+                    <div id="result" class="d-none">
 
-                        <div>
-                            <div class="small fw-semibold">
-                                <i class="bi bi-stars"></i> AI result
-                            </div>
-
-                            <h2 class="h3 fw-bold mb-1">
-                                Water bottle
-                            </h2>
-
-                            <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">
-                                Plastic · PET #1
-                            </span>
+                        <div class="small fw-semibold">
+                            <i class="bi bi-stars"></i> AI result
                         </div>
 
-                    </div>
+                        <h2 class="h3 fw-bold mb-1" id="itemName"></h2>
 
-                    <div class="alert alert-success py-2 fw-semibold">
-                        <i class="bi bi-check-lg"></i> Recyclable
-                    </div>
+                        <span
+                            class="badge rounded-pill bg-primary-subtle text-primary-emphasis mb-3"
+                            id="materialName"
+                        ></span>
 
-                    <div class="bg-body-secondary rounded-3 p-3 mb-3 d-flex align-items-center gap-3">
-
-                        <i class="bi bi-speedometer2 fs-4 text-success"></i>
-
-                        <div>
-                            <div class="small">
-                                Estimated weight
-                            </div>
-
-                            <div class="fs-5 fw-bold">
-                                30 g
-                            </div>
+                        <div
+                            id="recyclableBox"
+                            class="alert alert-success py-2 fw-semibold"
+                        >
+                            <i class="bi bi-check-lg"></i> Recyclable
                         </div>
 
+                        <div
+                            id="notRecyclableBox"
+                            class="alert alert-danger py-2 fw-semibold d-none"
+                        >
+                            <i class="bi bi-x-lg"></i>
+                            Not recyclable here. Put it in the regular bin.
+                        </div>
+
+                        <div class="bg-body-secondary rounded-3 p-3 mb-3">
+                            <div class="small">Estimated weight</div>
+                            <div class="fs-5 fw-bold" id="itemWeight"></div>
+                        </div>
+
+                        <h3 class="h6 fw-bold">How to prepare it</h3>
+                        <p id="itemTip"></p>
+
+                        <input type="hidden" id="scanId">
+
+                        <button
+                            type="button"
+                            id="addToBagBtn"
+                            class="btn btn-success w-100"
+                        >
+                            <i class="bi bi-bag"></i>
+                            Add to recycling bag
+                        </button>
+
                     </div>
-
-                    <h3 class="h6 fw-bold">
-                        How to prepare it
-                    </h3>
-
-                    <p>
-                        Rinse it, take off the cap and crush it so it takes less space.
-                    </p>
-
-                    <a href="{% url 'bag' %}" class="btn btn-success w-100 mb-2">
-                        <i class="bi bi-bag"></i> Add to recycling bag
-                    </a>
-
-                    <a href="#" class="link-success small">
-                        Wrong result? Correct it
-                    </a>
 
                 </div>
             </div>
-
         </div>
 
     </div>
-
-    <div class="alert alert-danger mt-3 mb-0">
-        <i class="bi bi-exclamation-circle"></i>
-        [Alternate state: item not recyclable]
-        "Multi-layer chip bags aren't recycled here. Put it in the regular bin."
-    </div>
-
 </div>
+
+<script src="{% static 'js/scan.js' %}"></script>
 {% endblock %}
