@@ -46,9 +46,11 @@
 
                 <div id="uploadText">
                     <i class="bi bi-camera-fill text-success display-1"></i>
+
                     <p class="fw-bold text-success-emphasis mt-2 mb-1">
                         Choose a photo
                     </p>
+
                     <p class="small mb-0">
                         Drag the photo here or choose one from your device
                     </p>
@@ -70,15 +72,54 @@
                 class="d-none"
             >
 
+            <!-- Live camera -->
+            <div id="cameraBox" class="d-none mb-3">
+                <video
+                    id="video"
+                    class="w-100 rounded-4 bg-dark"
+                    autoplay
+                    playsinline
+                ></video>
+
+                <div class="row g-2 mt-1">
+                    <div class="col-8">
+                        <button
+                            type="button"
+                            id="snapBtn"
+                            class="btn btn-success w-100"
+                        >
+                            <i class="bi bi-camera-fill"></i> Take photo
+                        </button>
+                    </div>
+
+                    <div class="col-4">
+                        <button
+                            type="button"
+                            id="closeCameraBtn"
+                            class="btn btn-outline-secondary w-100"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="row g-2">
                 <div class="col-6">
-                    <label for="cameraInput" class="btn btn-success w-100">
+                    <button
+                        type="button"
+                        id="cameraBtn"
+                        class="btn btn-success w-100"
+                    >
                         <i class="bi bi-camera"></i> Open camera
-                    </label>
+                    </button>
                 </div>
 
                 <div class="col-6">
-                    <label for="photoInput" class="btn btn-outline-success w-100">
+                    <label
+                        for="photoInput"
+                        class="btn btn-outline-success w-100"
+                    >
                         <i class="bi bi-upload"></i> Upload photo
                     </label>
                 </div>
@@ -100,6 +141,7 @@
 
                     <div id="emptyResult" class="text-center text-body-secondary py-5">
                         <i class="bi bi-stars display-4 text-success"></i>
+
                         <p class="mt-2">
                             The AI result will show here after you choose a photo.
                         </p>
@@ -162,4 +204,5 @@
 </div>
 
 <script src="{% static 'js/scan.js' %}"></script>
+
 {% endblock %}
