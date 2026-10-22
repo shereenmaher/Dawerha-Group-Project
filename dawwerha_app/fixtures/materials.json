@@ -1,0 +1,12 @@
+[
+  {"model": "dawwerha_app.material", "pk": 1, "fields": {"name": "PET plastic", "min_price": "0.30", "max_price": "1.50", "recyclable": true}},
+  {"model": "dawwerha_app.material", "pk": 2, "fields": {"name": "HDPE plastic", "min_price": "0.30", "max_price": "1.50", "recyclable": true}},
+  {"model": "dawwerha_app.material", "pk": 3, "fields": {"name": "Cardboard", "min_price": "0.10", "max_price": "0.80", "recyclable": true}},
+  {"model": "dawwerha_app.material", "pk": 4, "fields": {"name": "Paper", "min_price": "0.10", "max_price": "0.80", "recyclable": true}},
+  {"model": "dawwerha_app.material", "pk": 5, "fields": {"name": "Aluminium", "min_price": "2.00", "max_price": "8.00", "recyclable": true}},
+  {"model": "dawwerha_app.material", "pk": 6, "fields": {"name": "Iron", "min_price": "0.50", "max_price": "2.00", "recyclable": true}},
+  {"model": "dawwerha_app.material", "pk": 7, "fields": {"name": "Copper", "min_price": "15.00", "max_price": "40.00", "recyclable": true}},
+  {"model": "dawwerha_app.material", "pk": 8, "fields": {"name": "Glass", "min_price": "0.00", "max_price": "0.50", "recyclable": true}},
+  {"model": "dawwerha_app.material", "pk": 9, "fields": {"name": "Electronics", "min_price": "1.00", "max_price": "10.00", "recyclable": true}},
+  {"model": "dawwerha_app.material", "pk": 10, "fields": {"name": "Not recyclable", "min_price": "0.00", "max_price": "0.00", "recyclable": false}}
+]
