@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import ContactMessage, Profile, Collector, Material, Scan
+from .models import ContactMessage, Profile, Collector, Material, Scan, BagItem
 from .ai import analyze_image
 
 
@@ -116,8 +116,7 @@ def api_scan(request):
 
     try:
         result = analyze_image(image)
-    except Exception as e:
-        print("AI ERROR:", e)
+    except Exception:
         return JsonResponse(
             {'error': "We couldn't analyze the photo, please try again"},
             status=500
@@ -149,8 +148,103 @@ def api_scan(request):
     })
 
 
+# Add the scanned item to the user's bag
+@login_required(login_url='/login/')
+def api_add_to_bag(request):
+    if request.method != "POST":
+        return JsonResponse(
+            {'error': "Wrong request"},
+            status=400
+        )
+
+    scan = Scan.objects.filter(
+        id=request.POST.get('scan_id'),
+        user=request.user
+    ).first()
+
+    if scan is None or not scan.recyclable:
+        return JsonResponse(
+            {'error': "This item can't be added to the bag"},
+            status=400
+        )
+
+    BagItem.objects.create(
+        user=request.user,
+        material=scan.material,
+        item_name=scan.item_name,
+        quantity=1,
+        weight_kg=scan.weight_kg,
+    )
+
+    return JsonResponse({
+        'message': "Added to your bag"
+    })
+
+
+# Show the user's bag with the total weight
+@login_required(login_url='/login/')
 def bag(request):
-    return render(request, "bag.html")
+    items = list(
+        BagItem.objects.filter(user=request.user)
+    )
+
+    total_weight = 0
+
+    for item in items:
+        item.total = item.weight_kg * item.quantity
+        total_weight += item.total
+
+    context = {
+        'items': items,
+        'total_weight': round(total_weight, 2),
+        'percent': min(int(total_weight / 5 * 100), 100),
+        'left': round(max(5 - total_weight, 0), 2),
+        'can_pickup': total_weight >= 5,
+    }
+
+    return render(request, "bag.html", context)
+
+
+# Edit the quantity and weight of one item
+@login_required(login_url='/login/')
+def update_bag_item(request, id):
+    if request.method != "POST":
+        return redirect('/bag/')
+
+    item = BagItem.objects.filter(
+        id=id,
+        user=request.user
+    ).first()
+
+    if item is None:
+        return redirect('/bag/')
+
+    errors = BagItem.objects.bag_validator(request.POST)
+
+    if errors:
+        for key, value in errors.items():
+            messages.error(request, value)
+        return redirect('/bag/')
+
+    item.quantity = request.POST['quantity']
+    item.weight_kg = request.POST['weight_kg']
+    item.save()
+
+    messages.success(request, "Item updated")
+
+    return redirect('/bag/')
+
+
+# Remove one item from the bag
+@login_required(login_url='/login/')
+def delete_bag_item(request, id):
+    if request.method == "POST":
+        BagItem.objects.filter(
+            id=id,
+            user=request.user
+        ).delete()
+
+    return redirect('/bag/')
 
 
 def sites(request):
