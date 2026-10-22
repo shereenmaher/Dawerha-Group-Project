@@ -6,6 +6,9 @@ urlpatterns = [
     # ===== Dina =====
     path("", views.home, name="home"),
     path("login/", views.login_page, name="login"),
+    path("register/", views.register, name="register"),
+    path("login/submit/", views.login_user, name="login_user"),
+    path("logout/", views.logout_user, name="logout"),
 
     # ===== Shereen =====
     path("scan/", views.scan, name="scan"),
