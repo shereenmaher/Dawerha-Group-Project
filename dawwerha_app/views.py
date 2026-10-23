@@ -252,9 +252,13 @@ def delete_bag_item(request, id):
 
     return redirect('/bag/')
 
-
+# Recycling sites page, with the bag count for the navbar button
+@login_required(login_url='/login/')
 def sites(request):
-    return render(request, "sites.html")
+    context = {
+        'items': BagItem.objects.filter(user=request.user),
+    }
+    return render(request, "sites.html", context)
 
 
 # ===== Bara =====
