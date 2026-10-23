@@ -252,28 +252,37 @@ def delete_bag_item(request, id):
 
     return redirect('/bag/')
 
-
+# Recycling sites page, with the bag count for the navbar button
+@login_required(login_url='/login/')
 def sites(request):
-    return render(request, "sites.html")
+    context = {
+        'items': BagItem.objects.filter(user=request.user),
+    }
+    return render(request, "sites.html", context)
 
 
 # ===== Bara =====
+@login_required(login_url='/login/')
 def pickup(request):
     return render(request, "pickup.html")
 
 
+@login_required(login_url='/login/')
 def my_requests(request):
     return render(request, "my_requests.html")
 
 
+@login_required(login_url='/login/')
 def collector(request):
     return render(request, "collector.html")
 
 
+@login_not_required
 def about(request):
     return render(request, "about.html")
 
 
+@login_not_required
 def contact(request):
     if request.method == "POST":
         errors = ContactMessage.objects.contact_validator(request.POST)

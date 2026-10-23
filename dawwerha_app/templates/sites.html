@@ -4,7 +4,7 @@
 
 {% block navbar_right %}
     <a href="{% url 'bag' %}" class="btn btn-warning">
-        <i class="bi bi-bag"></i> Recycling bag (3)
+        <i class="bi bi-bag"></i> Recycling bag ({{ items|length }})
     </a>
 {% endblock %}
 
