@@ -10,10 +10,10 @@
 </head>
 <body class="bg-body-tertiary d-flex flex-column min-vh-100">
     {% block navbar %}
-    <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <nav class="navbar navbar-expand-lg bg-success sticky-top" data-bs-theme="dark">
         <div class="container-fluid px-4">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{% url 'home' %}">
-                <span class="bg-success text-white rounded-circle px-2 py-1"><i class="bi bi-recycle"></i></span>
+                <span class="bg-warning text-success rounded-circle p-2 lh-1"><i class="bi bi-recycle"></i></span>
                 Dawwerha
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
@@ -24,29 +24,29 @@
                 {% with page=request.resolver_match.url_name %}
                 <ul class="navbar-nav mx-auto gap-lg-2">
                     <li class="nav-item">
-                        <a class="nav-link {% if page == 'home' %}active fw-bold{% else %}link-success{% endif %}" href="{% url 'home' %}">Home</a>
+                        <a class="nav-link {% if page == 'home' %}active fw-bold text-warning{% else %}link-light link-opacity-75 link-opacity-100-hover{% endif %}" href="{% url 'home' %}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if page == 'scan' %}active fw-bold{% else %}link-success{% endif %}" href="{% url 'scan' %}">Scan your item</a>
+                        <a class="nav-link {% if page == 'scan' %}active fw-bold text-warning{% else %}link-light link-opacity-75 link-opacity-100-hover{% endif %}" href="{% url 'scan' %}">Scan your item</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if page == 'sites' %}active fw-bold{% else %}link-success{% endif %}" href="{% url 'sites' %}">Recycling sites</a>
+                        <a class="nav-link {% if page == 'sites' %}active fw-bold text-warning{% else %}link-light link-opacity-75 link-opacity-100-hover{% endif %}" href="{% url 'sites' %}">Recycling sites</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if page == 'my_requests' %}active fw-bold{% else %}link-success{% endif %}" href="{% url 'my_requests' %}">My requests</a>
+                        <a class="nav-link {% if page == 'my_requests' %}active fw-bold text-warning{% else %}link-light link-opacity-75 link-opacity-100-hover{% endif %}" href="{% url 'my_requests' %}">My requests</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if page == 'about' %}active fw-bold{% else %}link-success{% endif %}" href="{% url 'about' %}">About</a>
+                        <a class="nav-link {% if page == 'about' %}active fw-bold text-warning{% else %}link-light link-opacity-75 link-opacity-100-hover{% endif %}" href="{% url 'about' %}">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if page == 'contact' %}active fw-bold{% else %}link-success{% endif %}" href="{% url 'contact' %}">Contact</a>
+                        <a class="nav-link {% if page == 'contact' %}active fw-bold text-warning{% else %}link-light link-opacity-75 link-opacity-100-hover{% endif %}" href="{% url 'contact' %}">Contact</a>
                     </li>
                 </ul>
                 {% endwith %}
                 <div class="d-flex gap-2 mt-3 mt-lg-0">
                     {% block navbar_right %}
-                    <a href="{% url 'login' %}" class="btn btn-outline-success">Log in</a>
-                    <a href="{% url 'login' %}" class="btn btn-success">Register</a>
+                    <a href="{% url 'login' %}" class="btn btn-warning">Log in</a>
+                    <a href="{% url 'login' %}" class="btn btn-warning">Register</a>
                     {% endblock %}
                 </div>
             </div>
@@ -59,13 +59,10 @@
     {% block footer %}
     <footer class="bg-success text-white py-4 mt-auto">
         <div class="container-fluid px-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
-            <a class="fw-bold fs-5 text-white text-decoration-none" href="{% url 'home' %}">
-                <i class="bi bi-recycle me-1"></i> Dawwerha
+            <a class="fw-bold fs-5 text-white text-decoration-none d-inline-flex align-items-center gap-2" href="{% url 'home' %}">
+                <span class="bg-warning text-success rounded-circle p-2 lh-1"><i class="bi bi-recycle"></i></span>
+                Dawwerha
             </a>
-            <div class="d-flex gap-4">
-                <a class="text-white text-decoration-none" href="{% url 'about' %}">About</a>
-                <a class="text-white text-decoration-none" href="{% url 'contact' %}">Contact</a>
-            </div>
         </div>
     </footer>
     {% endblock %}

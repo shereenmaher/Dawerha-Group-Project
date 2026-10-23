@@ -3,7 +3,7 @@
 {% block title %}Request a pickup{% endblock %}
 
 {% block navbar_right %}
-<a href="{% url 'bag' %}" class="btn bg-success-subtle text-success-emphasis"><i class="bi bi-bag"></i> Recycling bag (3)</a>
+<a href="{% url 'bag' %}" class="btn btn-warning"><i class="bi bi-bag"></i> Recycling bag (3)</a>
 {% endblock %}
 
 {% block content %}
@@ -30,7 +30,7 @@
                         <div id="addressMap" class="bg-secondary-subtle rounded-3 border d-flex align-items-center justify-content-center text-body-secondary mb-3" style="height: 180px;">
                             [Map: drag the pin to your home]
                         </div>
-                        <button type="button" class="btn btn-outline-success btn-sm mb-3"><i class="bi bi-crosshair"></i> Use my current location</button>
+                        <button type="button" class="btn btn-warning btn-sm mb-3"><i class="bi bi-crosshair"></i> Use my current location</button>
                         <div>
                             <label for="address" class="form-label small fw-semibold">Address description</label>
                             <input type="text" class="form-control" id="address" name="address" placeholder="Neighborhood, street, building, floor" required>
@@ -49,13 +49,13 @@
                                     <div class="card-body">
                                         <div class="fw-bold"><span class="badge rounded-pill text-bg-success me-1">1</span> [Collector 1 – demo]</div>
                                         <div class="small text-body-secondary mb-2">[distance] km from you</div>
-                                        <div class="bg-body-secondary rounded-3 p-2 small mb-2">
+                                        <div class="bg-success bg-opacity-10 rounded-3 p-2 small mb-2">
                                             <div class="fw-semibold mb-1">Prices per kilo</div>
                                             <div class="d-flex justify-content-between"><span>Plastic</span><strong>₪[price]</strong></div>
                                             <div class="d-flex justify-content-between"><span>Cardboard</span><strong>₪[price]</strong></div>
                                             <div class="d-flex justify-content-between"><span>Aluminium</span><strong>₪[price]</strong></div>
                                         </div>
-                                        <button type="button" class="btn btn-success btn-sm w-100"><i class="bi bi-check-lg"></i> Choose this collector</button>
+                                        <button type="button" class="btn btn-warning btn-sm w-100"><i class="bi bi-check-lg"></i> Choose this collector</button>
                                     </div>
                                 </div>
                             </div>
@@ -91,8 +91,8 @@
                         <div class="d-flex justify-content-between fw-bold mb-3"><span>Estimated weight</span><span>5.2 kg</span></div>
 
                         <div class="alert alert-success small py-2"><i class="bi bi-cash"></i> Payment is cash from the collector, based on the real weight.</div>
-                        <button type="submit" class="btn btn-success w-100 mb-2">Send request</button>
-                        <div class="bg-body-secondary rounded-3 p-2 small"><i class="bi bi-envelope"></i> After sending, you get a confirmation email, and the collector sees your request.</div>
+                        <button type="submit" class="btn btn-warning w-100 mb-2">Send request</button>
+                        <div class="bg-success bg-opacity-10 rounded-3 p-2 small"><i class="bi bi-envelope"></i> After sending, you get a confirmation email, and the collector sees your request.</div>
                     </div>
                 </div>
             </div>
