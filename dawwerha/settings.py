@@ -1,11 +1,6 @@
-"""
-Django settings for dawwerha project.
-"""
-
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,6 +39,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Every page needs login, except the ones marked with @login_not_required
+    'django.contrib.auth.middleware.LoginRequiredMiddleware',
 ]
 
 

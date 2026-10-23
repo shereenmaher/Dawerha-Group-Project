@@ -2,17 +2,21 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, login_not_required
 from django.http import JsonResponse
 from .models import ContactMessage, Profile, Collector, Material, Scan, BagItem
 from .ai import analyze_image
 
 
 # ===== Dina =====
+# Home page, open for everyone
+@login_not_required
 def home(request):
     return render(request, "home.html")
 
 
+# Login page, open for everyone
+@login_not_required
 def login_page(request):
     return render(request, "login.html")
 
@@ -25,6 +29,7 @@ def go_home_by_role(user):
 
 
 # Create a new account
+@login_not_required
 def register(request):
     if request.method != "POST":
         return redirect('/login/')
@@ -46,14 +51,14 @@ def register(request):
     Profile.objects.create(
         user=user,
         role=request.POST['role'],
-        phone=request.POST['phone']
+        phone=request.POST['phone'],
     )
 
     if request.POST['role'] == "collector":
         Collector.objects.create(
             user=user,
             name=request.POST['full_name'],
-            phone=request.POST['phone']
+            phone=request.POST['phone'],
         )
 
     login(request, user)
@@ -61,6 +66,7 @@ def register(request):
 
 
 # Log in with email and password
+@login_not_required
 def login_user(request):
     if request.method != "POST":
         return redirect('/login/')
@@ -75,14 +81,14 @@ def login_user(request):
     user = authenticate(
         request,
         username=request.POST['email'],
-        password=request.POST['password']
+        password=request.POST['password'],
     )
 
     if user is None:
         messages.error(
             request,
             "Wrong email or password",
-            extra_tags='login'
+            extra_tags='login',
         )
         return redirect('/login/')
 
@@ -109,7 +115,7 @@ def api_scan(request):
     if request.method != "POST" or 'image' not in request.FILES:
         return JsonResponse(
             {'error': "Please choose a photo"},
-            status=400
+            status=400,
         )
 
     image = request.FILES['image']
@@ -119,7 +125,7 @@ def api_scan(request):
     except Exception:
         return JsonResponse(
             {'error': "We couldn't analyze the photo, please try again"},
-            status=500
+            status=500,
         )
 
     material = Material.objects.filter(
@@ -154,18 +160,18 @@ def api_add_to_bag(request):
     if request.method != "POST":
         return JsonResponse(
             {'error': "Wrong request"},
-            status=400
+            status=400,
         )
 
     scan = Scan.objects.filter(
         id=request.POST.get('scan_id'),
-        user=request.user
+        user=request.user,
     ).first()
 
     if scan is None or not scan.recyclable:
         return JsonResponse(
             {'error': "This item can't be added to the bag"},
-            status=400
+            status=400,
         )
 
     BagItem.objects.create(
@@ -213,7 +219,7 @@ def update_bag_item(request, id):
 
     item = BagItem.objects.filter(
         id=id,
-        user=request.user
+        user=request.user,
     ).first()
 
     if item is None:
@@ -241,7 +247,7 @@ def delete_bag_item(request, id):
     if request.method == "POST":
         BagItem.objects.filter(
             id=id,
-            user=request.user
+            user=request.user,
         ).delete()
 
     return redirect('/bag/')
@@ -285,7 +291,7 @@ def contact(request):
 
         messages.success(
             request,
-            "Your message was sent successfully"
+            "Your message was sent successfully",
         )
 
         return redirect('/contact/')
