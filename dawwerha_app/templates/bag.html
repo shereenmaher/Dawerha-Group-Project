@@ -3,9 +3,9 @@
 {% block title %}Recycling bag{% endblock %}
 
 {% block navbar_right %}
-    <a href="{% url 'bag' %}" class="btn btn-success">
-        <i class="bi bi-bag"></i> Recycling bag (3)
-    </a>
+<a href="{% url 'bag' %}" class="btn btn-success">
+    <i class="bi bi-bag"></i> Recycling bag ({{ items|length }})
+</a>
 {% endblock %}
 
 {% block content %}
@@ -34,118 +34,121 @@
 
             </div>
 
-            <!-- Water bottles -->
-            <div class="card mb-2">
-                <div class="card-body d-flex align-items-center gap-3">
+            <!-- Messages -->
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="alert alert-success py-2">{{ message }}</div>
+                {% else %}
+                    <div class="alert alert-danger py-2">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
 
-                    <span class="bg-success-subtle text-success rounded-3 p-3 fs-4 lh-1">
-                        <i class="bi bi-recycle"></i>
-                    </span>
+            <!-- Bag items -->
+            {% for item in items %}
+                <div class="card mb-2">
+                    <div class="card-body">
 
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">
-                            Water bottles ×20
+                        <div class="d-flex align-items-center gap-3">
+
+                            <span class="bg-success-subtle text-success rounded-3 p-3 fs-4 lh-1">
+                                <i class="bi bi-recycle"></i>
+                            </span>
+
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">
+                                    {{ item.item_name }} ×{{ item.quantity }}
+                                </div>
+
+                                <span class="badge rounded-pill bg-success-subtle text-success-emphasis">
+                                    {{ item.material.name }}
+                                </span>
+                            </div>
+
+                            <div class="text-end me-2">
+                                <div class="small text-body-secondary">
+                                    Est. weight
+                                </div>
+
+                                <div class="fw-bold">
+                                    {{ item.total }} kg
+                                </div>
+                            </div>
+
+                            <form action="{% url 'delete_bag_item' item.id %}" method="post">
+                                {% csrf_token %}
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-danger btn-sm"
+                                    aria-label="Remove item"
+                                >
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+
                         </div>
 
-                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">
-                            PET plastic
-                        </span>
+                        <!-- Edit item -->
+                        <form
+                            action="{% url 'update_bag_item' item.id %}"
+                            method="post"
+                            class="row g-2 align-items-end mt-2"
+                        >
+                            {% csrf_token %}
+
+                            <div class="col-4">
+                                <label class="form-label small mb-0">
+                                    Quantity
+                                </label>
+                                <input
+                                    type="number"
+                                    name="quantity"
+                                    value="{{ item.quantity }}"
+                                    min="1"
+                                    class="form-control form-control-sm"
+                                >
+                            </div>
+
+                            <div class="col-5">
+                                <label class="form-label small mb-0">
+                                    Weight of one item (kg)
+                                </label>
+                                <input
+                                    type="number"
+                                    name="weight_kg"
+                                    value="{{ item.weight_kg }}"
+                                    step="0.001"
+                                    min="0.001"
+                                    class="form-control form-control-sm"
+                                >
+                            </div>
+
+                            <div class="col-3">
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-success btn-sm w-100"
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+
                     </div>
-
-                    <div class="text-end me-2">
-                        <div class="small text-body-secondary">
-                            Est. weight
-                        </div>
-
-                        <div class="fw-bold">
-                            0.6 kg
-                        </div>
-                    </div>
-
-                    <button type="button"
-                            class="btn btn-outline-danger btn-sm"
-                            aria-label="Remove item">
-                        <i class="bi bi-trash"></i>
-                    </button>
-
                 </div>
-            </div>
 
-            <!-- Cardboard boxes -->
-            <div class="card mb-2">
-                <div class="card-body d-flex align-items-center gap-3">
+            {% empty %}
+                <div class="card">
+                    <div class="card-body text-center text-body-secondary py-5">
+                        <i class="bi bi-bag display-4"></i>
+                        <p class="mt-2 mb-3">Your bag is empty.</p>
 
-                    <span class="bg-success-subtle text-success rounded-3 p-3 fs-4 lh-1">
-                        <i class="bi bi-recycle"></i>
-                    </span>
-
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">
-                            Cardboard boxes
-                        </div>
-
-                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">
-                            Paper and cardboard
-                        </span>
+                        <a href="{% url 'scan' %}" class="btn btn-success">
+                            <i class="bi bi-camera"></i> Scan your first item
+                        </a>
                     </div>
-
-                    <div class="text-end me-2">
-                        <div class="small text-body-secondary">
-                            Est. weight
-                        </div>
-
-                        <div class="fw-bold">
-                            3 kg
-                        </div>
-                    </div>
-
-                    <button type="button"
-                            class="btn btn-outline-danger btn-sm"
-                            aria-label="Remove item">
-                        <i class="bi bi-trash"></i>
-                    </button>
-
                 </div>
-            </div>
+            {% endfor %}
 
-            <!-- Cola cans -->
-            <div class="card mb-2">
-                <div class="card-body d-flex align-items-center gap-3">
-
-                    <span class="bg-success-subtle text-success rounded-3 p-3 fs-4 lh-1">
-                        <i class="bi bi-recycle"></i>
-                    </span>
-
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">
-                            Cola cans ×15
-                        </div>
-
-                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">
-                            Aluminium
-                        </span>
-                    </div>
-
-                    <div class="text-end me-2">
-                        <div class="small text-body-secondary">
-                            Est. weight
-                        </div>
-
-                        <div class="fw-bold">
-                            0.2 kg
-                        </div>
-                    </div>
-
-                    <button type="button"
-                            class="btn btn-outline-danger btn-sm"
-                            aria-label="Remove item">
-                        <i class="bi bi-trash"></i>
-                    </button>
-
-                </div>
-            </div>
-
-            <p class="small text-body-secondary">
+            <p class="small text-body-secondary mt-2">
                 Weights are estimates. The collector pays you in cash based on the real weight.
             </p>
 
@@ -171,7 +174,7 @@
                         </span>
 
                         <strong>
-                            3.8 kg
+                            {{ total_weight }} kg
                         </strong>
                     </div>
 
@@ -181,39 +184,52 @@
                             Home pickup unlocks at 5 kg
                         </div>
 
-                        <div class="progress mb-1"
-                             role="progressbar"
-                             aria-label="Bag progress"
-                             aria-valuenow="76"
-                             aria-valuemin="0"
-                             aria-valuemax="100"
-                             style="height: 8px;">
+                        <div class="progress mb-1" style="height: 8px;">
+                            <div
+                                class="progress-bar bg-success"
+                                style="width: {{ percent }}%"
+                            ></div>
+                        </div>
 
-                            <div class="progress-bar bg-success"
-                                 style="width: 76%">
+                        {% if can_pickup %}
+                            <div class="small text-success fw-semibold">
+                                Your bag is ready for pickup
                             </div>
-
-                        </div>
-
-                        <div class="small">
-                            1.2 kg to go
-                        </div>
+                        {% else %}
+                            <div class="small">
+                                {{ left }} kg to go
+                            </div>
+                        {% endif %}
 
                     </div>
 
-                    <a href="{% url 'sites' %}"
-                       class="btn btn-success w-100 mb-2">
+                    <a
+                        href="{% url 'sites' %}"
+                        class="btn btn-success w-100 mb-2"
+                    >
                         <i class="bi bi-geo-alt"></i> I'll drop it off myself
                     </a>
 
-                    <a href="{% url 'pickup' %}"
-                       class="btn btn-outline-success w-100">
-                        <i class="bi bi-truck"></i> Request a pickup
-                    </a>
+                    {% if can_pickup %}
+                        <a
+                            href="{% url 'pickup' %}"
+                            class="btn btn-outline-success w-100"
+                        >
+                            <i class="bi bi-truck"></i> Request a pickup
+                        </a>
+                    {% else %}
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary w-100"
+                            disabled
+                        >
+                            <i class="bi bi-lock"></i> Request a pickup
+                        </button>
 
-                    <p class="small text-body-secondary mt-2 mb-0">
-                        [The pickup button looks locked until the bag reaches 5 kg, with a short message explaining why.]
-                    </p>
+                        <p class="small text-body-secondary mt-2 mb-0">
+                            You need at least 5 kg in your bag to request a home pickup.
+                        </p>
+                    {% endif %}
 
                 </div>
             </div>
