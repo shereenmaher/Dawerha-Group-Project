@@ -4,7 +4,7 @@
 {% block title %}Scan your item{% endblock %}
 
 {% block navbar_right %}
-<a href="{% url 'bag' %}" class="btn bg-success-subtle text-success-emphasis">
+<a href="{% url 'bag' %}" class="btn btn-warning">
     <i class="bi bi-bag"></i> Recycling bag
 </a>
 {% endblock %}
@@ -86,7 +86,7 @@
                         <button
                             type="button"
                             id="snapBtn"
-                            class="btn btn-success w-100"
+                            class="btn btn-warning w-100"
                         >
                             <i class="bi bi-camera-fill"></i> Take photo
                         </button>
@@ -96,7 +96,7 @@
                         <button
                             type="button"
                             id="closeCameraBtn"
-                            class="btn btn-outline-secondary w-100"
+                            class="btn btn-warning w-100"
                         >
                             Close
                         </button>
@@ -109,7 +109,7 @@
                     <button
                         type="button"
                         id="cameraBtn"
-                        class="btn btn-success w-100"
+                        class="btn btn-warning w-100"
                     >
                         <i class="bi bi-camera"></i> Open camera
                     </button>
@@ -118,7 +118,7 @@
                 <div class="col-6">
                     <label
                         for="photoInput"
-                        class="btn btn-outline-success w-100"
+                        class="btn btn-warning w-100"
                     >
                         <i class="bi bi-upload"></i> Upload photo
                     </label>
@@ -175,7 +175,7 @@
                             Not recyclable here. Put it in the regular bin.
                         </div>
 
-                        <div class="bg-body-secondary rounded-3 p-3 mb-3">
+                        <div class="bg-success bg-opacity-10 rounded-3 p-3 mb-3">
                             <div class="small">Estimated weight</div>
                             <div class="fs-5 fw-bold" id="itemWeight"></div>
                         </div>
@@ -188,7 +188,7 @@
                         <button
                             type="button"
                             id="addToBagBtn"
-                            class="btn btn-success w-100"
+                            class="btn btn-warning w-100"
                         >
                             <i class="bi bi-bag"></i>
                             Add to recycling bag

@@ -3,10 +3,10 @@
 {% block title %}My requests{% endblock %}
 
 {% block navbar_right %}
-<span class="d-flex align-items-center gap-2 small">
-    <span class="bg-success-subtle text-success-emphasis rounded-circle px-2 py-1 fw-bold">[N]</span> Hi, [Name]
+<span class="d-flex align-items-center gap-2 small text-white">
+    <span class="bg-warning text-success rounded-circle px-2 py-1 fw-bold">[N]</span> Hi, [Name]
 </span>
-<a href="{% url 'home' %}" class="btn btn-outline-success">Log out</a>
+<a href="{% url 'home' %}" class="btn btn-warning">Log out</a>
 {% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h2 fw-bold mb-0">My requests</h1>
-        <a href="{% url 'pickup' %}" class="btn btn-success"><i class="bi bi-plus-lg"></i> New request</a>
+        <a href="{% url 'pickup' %}" class="btn btn-warning"><i class="bi bi-plus-lg"></i> New request</a>
     </div>
 
     <!-- Stats -->
@@ -54,8 +54,8 @@
                         <div class="small text-body-secondary">[Date] · Collector: [Collector 1 – demo]</div>
                     </div>
                     <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">Pending</span>
-                    <button type="button" class="btn btn-outline-success btn-sm"><i class="bi bi-pencil"></i> Edit</button>
-                    <button type="button" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Cancel request</button>
+                    <button type="button" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i> Edit</button>
+                    <button type="button" class="btn btn-warning btn-sm"><i class="bi bi-trash"></i> Cancel request</button>
                 </div>
             </div>
 
@@ -67,7 +67,7 @@
                         <div class="small text-body-secondary">[Date] · Collector: [collector name]</div>
                     </div>
                     <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">Accepted</span>
-                    <a href="#" class="btn btn-outline-secondary btn-sm"><i class="bi bi-whatsapp"></i> WhatsApp collector</a>
+                    <a href="#" class="btn btn-warning btn-sm"><i class="bi bi-whatsapp"></i> WhatsApp collector</a>
                 </div>
             </div>
 
@@ -90,7 +90,7 @@
                         <div class="small text-body-secondary">[Date] · The collector couldn't take this request</div>
                     </div>
                     <span class="badge rounded-pill bg-danger-subtle text-danger-emphasis">Rejected</span>
-                    <a href="{% url 'pickup' %}" class="btn btn-outline-success btn-sm">Choose another collector</a>
+                    <a href="{% url 'pickup' %}" class="btn btn-warning btn-sm">Choose another collector</a>
                 </div>
             </div>
 
@@ -117,7 +117,7 @@
                             <input type="email" class="form-control" id="email" name="email" value="[email]" required>
                         </div>
                         <p class="text-danger small">[Validation errors appear here]</p>
-                        <button type="submit" class="btn btn-success w-100">Save changes</button>
+                        <button type="submit" class="btn btn-warning w-100">Save changes</button>
                     </form>
                 </div>
             </div>

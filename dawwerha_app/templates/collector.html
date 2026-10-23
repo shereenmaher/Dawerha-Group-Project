@@ -5,7 +5,7 @@
 {% block navbar %}
 <nav class="navbar navbar-expand-lg bg-success navbar-dark">
     <div class="container-fluid px-4">
-        <a class="navbar-brand fw-bold" href="{% url 'collector' %}"><i class="bi bi-recycle"></i> Dawwerha · for collectors</a>
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{% url 'collector' %}"><span class="bg-warning text-success rounded-circle p-2 lh-1"><i class="bi bi-recycle"></i></span> Dawwerha · for collectors</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collectorNav"
                 aria-controls="collectorNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -17,8 +17,8 @@
                 <li class="nav-item"><a class="nav-link" href="#info">My info</a></li>
             </ul>
             <div class="d-flex align-items-center gap-2 text-white small">
-                <span class="bg-white text-success rounded-circle px-2 py-1 fw-bold">[C]</span> [Collector name]
-                <a href="{% url 'home' %}" class="btn btn-outline-light btn-sm ms-2">Log out</a>
+                <span class="bg-warning text-success rounded-circle px-2 py-1 fw-bold">[C]</span> [Collector name]
+                <a href="{% url 'home' %}" class="btn btn-warning btn-sm ms-2">Log out</a>
             </div>
         </div>
     </div>
@@ -69,22 +69,22 @@
                             <td>[Neighborhood]</td><td>Cardboard · Plastic · Aluminium</td><td>5.2 kg</td><td>[0] km</td>
                             <td><span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">New</span></td>
                             <td class="text-end text-nowrap">
-                                <button type="button" class="btn btn-success btn-sm">Accept</button>
-                                <button type="button" class="btn btn-outline-danger btn-sm">Reject</button>
+                                <button type="button" class="btn btn-warning btn-sm">Accept</button>
+                                <button type="button" class="btn btn-warning btn-sm">Reject</button>
                             </td>
                         </tr>
                         <tr>
                             <td>[Neighborhood]</td><td>Iron · Copper</td><td>12 kg</td><td>[0] km</td>
                             <td><span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">New</span></td>
                             <td class="text-end text-nowrap">
-                                <button type="button" class="btn btn-success btn-sm">Accept</button>
-                                <button type="button" class="btn btn-outline-danger btn-sm">Reject</button>
+                                <button type="button" class="btn btn-warning btn-sm">Accept</button>
+                                <button type="button" class="btn btn-warning btn-sm">Reject</button>
                             </td>
                         </tr>
                         <tr>
                             <td>[Neighborhood]</td><td>Cardboard</td><td>3 kg</td><td>[0] km</td>
                             <td><span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">Accepted</span></td>
-                            <td class="text-end"><button type="button" class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i> Completed</button></td>
+                            <td class="text-end"><button type="button" class="btn btn-warning btn-sm"><i class="bi bi-check-lg"></i> Completed</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -104,8 +104,8 @@
                         <div class="bg-secondary-subtle rounded-3 border d-flex align-items-center justify-content-center text-success fs-2" style="width: 150px; height: 80px;"><i class="bi bi-geo-alt-fill"></i></div>
                         <div>
                             <div class="small mb-2">[User name] · [Address] · Payment: cash</div>
-                            <a href="#" class="btn btn-outline-success btn-sm"><i class="bi bi-whatsapp"></i> WhatsApp</a>
-                            <a href="#" class="btn btn-outline-success btn-sm"><i class="bi bi-sign-turn-right"></i> Directions</a>
+                            <a href="#" class="btn btn-warning btn-sm"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+                            <a href="#" class="btn btn-warning btn-sm"><i class="bi bi-sign-turn-right"></i> Directions</a>
                         </div>
                     </div>
                     <form method="post" novalidate>
@@ -127,7 +127,7 @@
                         <div class="alert alert-success d-flex justify-content-between fw-bold py-2">
                             <span>Amount to pay in cash</span><span>₪[000]</span>
                         </div>
-                        <button type="submit" class="btn btn-success w-100">Confirm pickup</button>
+                        <button type="submit" class="btn btn-warning w-100">Confirm pickup</button>
                     </form>
                 </div>
             </div>
@@ -139,7 +139,7 @@
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="h5 fw-bold mb-0">My prices per kilo</h2>
-                        <button type="button" class="btn btn-outline-success btn-sm"><i class="bi bi-pencil"></i> Edit prices</button>
+                        <button type="button" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i> Edit prices</button>
                     </div>
                     <ul class="list-group list-group-flush mb-3">
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">Cardboard
@@ -151,7 +151,7 @@
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">Copper
                             <span><strong>₪[price] / kg</strong> <button type="button" class="btn btn-outline-danger btn-sm ms-2" aria-label="Remove copper"><i class="bi bi-trash"></i></button></span></li>
                     </ul>
-                    <form method="post" class="bg-body-secondary rounded-3 p-3" novalidate>
+                    <form method="post" class="bg-success bg-opacity-10 rounded-3 p-3" novalidate>
                         {% csrf_token %}
                         <div class="fw-semibold small mb-2">Add a new material</div>
                         <div class="row g-2 mb-2">
@@ -168,7 +168,7 @@
                                 <input type="number" step="0.1" min="0" class="form-control" id="newPrice" name="price" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success w-100"><i class="bi bi-plus-lg"></i> Add material</button>
+                        <button type="submit" class="btn btn-warning w-100"><i class="bi bi-plus-lg"></i> Add material</button>
                     </form>
                 </div>
             </div>
@@ -196,10 +196,10 @@
                         <input type="number" min="1" class="form-control" id="cCoverage" name="coverage_km" value="5">
                     </div>
                     <div class="col-md-3">
-                        <button type="button" class="btn btn-outline-success w-100"><i class="bi bi-crosshair"></i> Set my location on the map</button>
+                        <button type="button" class="btn btn-warning w-100"><i class="bi bi-crosshair"></i> Set my location on the map</button>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-success">Save changes</button>
+                <button type="submit" class="btn btn-warning">Save changes</button>
             </form>
         </div>
     </div>
