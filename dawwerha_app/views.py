@@ -5,7 +5,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, login_not_required
 from django.http import JsonResponse
 from django.db.models import Sum
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
+from django.conf import settings
 from django.utils import timezone
 from .models import ContactMessage, Profile, Collector, Material, Scan, BagItem, PickupRequest, PickupItem, CollectorPrice, full_phone, check_phone, EMAIL_REGEX
 from .ai import analyze_image
@@ -711,6 +712,8 @@ def about(request):
     return render(request, "about.html")
 
 
+# Contact us: save the message, send it to the Dawwerha email
+# and send a "we got your message" email to the person
 @login_not_required
 def contact(request):
     if request.method == "POST":
@@ -721,10 +724,31 @@ def contact(request):
                 messages.error(request, value)
             return redirect('/contact/')
 
+        name = request.POST['name']
+        email = request.POST['email']
+        message = request.POST['message']
+
         ContactMessage.objects.create(
-            name=request.POST['name'],
-            email=request.POST['email'],
-            message=request.POST['message'],
+            name=name,
+            email=email,
+            message=message,
+        )
+
+        # The message goes to our email. "Reply" in Gmail answers the person.
+        EmailMessage(
+            subject=f"New message from {name}",
+            body=f"From: {name} <{email}>\n\n{message}",
+            to=[settings.EMAIL_HOST_USER or "dawwerha4@gmail.com"],
+            reply_to=[email],
+        ).send(fail_silently=True)
+
+        # Tell the person we got the message
+        send_mail(
+            "We got your message",
+            f"Hi {name},\n\nThank you for contacting Dawwerha. We got your message and we'll reply soon.\n\nDawwerha team",
+            None,
+            [email],
+            fail_silently=True,
         )
 
         messages.success(
