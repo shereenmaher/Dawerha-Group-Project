@@ -4,6 +4,24 @@ from django.contrib.auth.models import User
 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 
+# The country codes people can choose for their WhatsApp number
+PHONE_CODES = ["970", "972"]
+
+
+# Check the country code and the phone number (used by the register and My info forms)
+def check_phone(postData, errors):
+    phone = postData.get('phone', '')
+    if postData.get('phone_code', '') not in PHONE_CODES:
+        errors['phone_code'] = "Please choose +970 or +972"
+    if len(phone) != 10 or not phone.isdigit() or not phone.startswith('05'):
+        errors['phone'] = "Phone number should be 10 digits and start with 05"
+    return errors
+
+
+# Join the country code and the number: "970" + "0591234567" -> "+970591234567"
+def full_phone(postData):
+    return "+" + postData['phone_code'] + postData['phone'][1:]
+
 
 # Register and login validation
 class ProfileManager(models.Manager):
@@ -14,9 +32,8 @@ class ProfileManager(models.Manager):
         if not EMAIL_REGEX.match(postData['email']):
             errors['email'] = "Invalid email address"
         elif User.objects.filter(username=postData['email']).exists():
-            errors['email'] = "Email already exists"
-        if len(postData['phone']) != 10:
-            errors['phone'] = "Phone number should be 10 digits"
+            errors['email'] = "Invalid email address"
+        check_phone(postData, errors)
         if len(postData['password']) < 8:
             errors['password'] = "Password should be at least 8 characters"
         return errors
@@ -51,8 +68,7 @@ class CollectorManager(models.Manager):
         errors = {}
         if len(postData['name']) < 2:
             errors['name'] = "Name should be at least 2 characters"
-        if len(postData['phone']) != 10:
-            errors['phone'] = "Phone number should be 10 digits"
+        check_phone(postData, errors)
         try:
             if int(postData['coverage_km']) < 1:
                 errors['coverage_km'] = "Coverage area should be at least 1 km"

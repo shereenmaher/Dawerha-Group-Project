@@ -43,7 +43,7 @@
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label for="loginEmail" class="form-label small fw-semibold">Email</label>
-                                <input type="email" class="form-control" id="loginEmail" name="email" placeholder="name@example.com" required>
+                                <input type="email" class="form-control" id="loginEmail" name="email" placeholder="name@example.com" value="{{ login_form.email }}" required>
                             </div>
                             <div class="mb-2">
                                 <label for="loginPassword" class="form-label small fw-semibold">Password</label>
@@ -71,13 +71,13 @@
                             <label class="form-label small fw-semibold">Account type</label>
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
-                                    <input type="radio" class="btn-check" name="role" id="roleUser" value="user" checked>
+                                    <input type="radio" class="btn-check" name="role" id="roleUser" value="user" {% if register_form.role != 'collector' %}checked{% endif %}>
                                     <label class="btn btn-outline-success w-100 text-start p-3" for="roleUser">
                                         <i class="bi bi-person d-block fs-4"></i> User
                                     </label>
                                 </div>
                                 <div class="col-6">
-                                    <input type="radio" class="btn-check" name="role" id="roleCollector" value="collector">
+                                    <input type="radio" class="btn-check" name="role" id="roleCollector" value="collector" {% if register_form.role == 'collector' %}checked{% endif %}>
                                     <label class="btn btn-outline-success w-100 text-start p-3" for="roleCollector">
                                         <i class="bi bi-truck d-block fs-4"></i> Collector / collection point
                                     </label>
@@ -85,15 +85,22 @@
                             </div>
                             <div class="mb-3">
                                 <label for="regName" class="form-label small fw-semibold">Full name</label>
-                                <input type="text" class="form-control" id="regName" name="full_name" required>
+                                <input type="text" class="form-control" id="regName" name="full_name" value="{{ register_form.full_name }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="regEmail" class="form-label small fw-semibold">Email</label>
-                                <input type="email" class="form-control" id="regEmail" name="email" required>
+                                <input type="email" class="form-control" id="regEmail" name="email" value="{{ register_form.email }}" required>
                             </div>
                             <div class="mb-3">
-                                <label for="regPhone" class="form-label small fw-semibold">Phone number</label>
-                                <input type="tel" class="form-control" id="regPhone" name="phone" placeholder="059xxxxxxx" required>
+                                <label for="regPhone" class="form-label small fw-semibold">WhatsApp number</label>
+                                <div class="input-group">
+                                    <select class="form-select flex-grow-0 w-auto" id="regPhoneCode" name="phone_code" aria-label="Country code">
+                                        <option value="970" {% if register_form.phone_code == '970' %}selected{% endif %}>+970</option>
+                                        <option value="972" {% if register_form.phone_code == '972' %}selected{% endif %}>+972</option>
+                                    </select>
+                                    <input type="tel" class="form-control" id="regPhone" name="phone" placeholder="059xxxxxxx" value="{{ register_form.phone }}" required>
+                                </div>
+                                <div class="form-text">Choose the code your WhatsApp uses.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="regPassword" class="form-label small fw-semibold">Password</label>

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, login_not_required
 from django.http import JsonResponse
 from django.db.models import Sum
-from .models import ContactMessage, Profile, Collector, Material, Scan, BagItem, PickupRequest, PickupItem
+from .models import ContactMessage, Profile, Collector, Material, Scan, BagItem, PickupRequest, PickupItem, full_phone
 from .ai import analyze_image
 
 
@@ -26,10 +26,15 @@ def home(request):
     return render(request, "home.html", context)
 
 
-# Login page, open for everyone
+# Login page, open for everyone.
+# After a validation error, it fills the forms again with what the person typed.
 @login_not_required
 def login_page(request):
-    return render(request, "login.html")
+    context = {
+        'login_form': request.session.pop('login_form', {}),
+        'register_form': request.session.pop('register_form', {}),
+    }
+    return render(request, "login.html", context)
 
 
 # Send each user to their own page
@@ -50,6 +55,14 @@ def register(request):
     if errors:
         for key, value in errors.items():
             messages.error(request, value, extra_tags='register')
+        # Keep what the person typed (not the password) to show it again
+        request.session['register_form'] = {
+            'role': request.POST.get('role', 'user'),
+            'full_name': request.POST.get('full_name', ''),
+            'email': request.POST.get('email', ''),
+            'phone_code': request.POST.get('phone_code', ''),
+            'phone': request.POST.get('phone', ''),
+        }
         return redirect('/login/')
 
     user = User.objects.create_user(
@@ -62,14 +75,14 @@ def register(request):
     Profile.objects.create(
         user=user,
         role=request.POST['role'],
-        phone=request.POST['phone'],
+        phone=full_phone(request.POST),
     )
 
     if request.POST['role'] == "collector":
         Collector.objects.create(
             user=user,
             name=request.POST['full_name'],
-            phone=request.POST['phone'],
+            phone=full_phone(request.POST),
         )
 
     login(request, user)
@@ -87,6 +100,8 @@ def login_user(request):
     if errors:
         for key, value in errors.items():
             messages.error(request, value, extra_tags='login')
+        # Keep the email (not the password) to show it again
+        request.session['login_form'] = {'email': request.POST.get('email', '')}
         return redirect('/login/')
 
     user = authenticate(
@@ -101,6 +116,7 @@ def login_user(request):
             "Wrong email or password",
             extra_tags='login',
         )
+        request.session['login_form'] = {'email': request.POST.get('email', '')}
         return redirect('/login/')
 
     login(request, user)

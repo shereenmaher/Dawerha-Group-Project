@@ -109,8 +109,14 @@
                             <input type="text" class="form-control" id="fullName" name="full_name" value="[Full name]" required>
                         </div>
                         <div class="mb-3">
-                            <label for="phone" class="form-label small fw-semibold">Phone number</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" placeholder="059xxxxxxx">
+                            <label for="phone" class="form-label small fw-semibold">WhatsApp number</label>
+                            <div class="input-group">
+                                <select class="form-select flex-grow-0 w-auto" id="phoneCode" name="phone_code" aria-label="Country code">
+                                    <option value="970">+970</option>
+                                    <option value="972">+972</option>
+                                </select>
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="059xxxxxxx">
+                            </div>
                         </div>
                         <div class="mb-2">
                             <label for="email" class="form-label small fw-semibold">Email</label>
