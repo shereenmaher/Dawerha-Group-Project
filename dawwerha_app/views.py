@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.db.models import Sum
 from django.core.mail import send_mail
 from django.utils import timezone
-from .models import ContactMessage, Profile, Collector, Material, Scan, BagItem, PickupRequest, PickupItem, CollectorPrice, full_phone
+from .models import ContactMessage, Profile, Collector, Material, Scan, BagItem, PickupRequest, PickupItem, CollectorPrice, full_phone, check_phone, EMAIL_REGEX
 from .ai import analyze_image
 
 
@@ -399,12 +399,17 @@ def pickup(request):
     collectors = []
     map_points = []
     for collector in Collector.objects.filter(kind="mobile", is_available=True):
+        # All the collector's prices, and the amount for the items in the bag
         prices = []
         amount = 0
-        for material, weight in totals.items():
-            price = CollectorPrice.objects.filter(collector=collector, material=material).first()
-            if price:
-                prices.append({'material': material.name, 'price': price.price_per_kg})
+        for price in CollectorPrice.objects.filter(collector=collector).order_by('material__id'):
+            weight = totals.get(price.material)
+            prices.append({
+                'material': price.material.name,
+                'price': price.price_per_kg,
+                'in_bag': weight is not None,
+            })
+            if weight:
                 amount += price.price_per_kg * weight
 
         collectors.append({
@@ -433,9 +438,106 @@ def pickup(request):
     return render(request, "pickup.html", context)
 
 
+# ----- My requests (normal user) -----
+# The user's requests, numbers and info
 @login_required(login_url='/login/')
 def my_requests(request):
-    return render(request, "my_requests.html")
+    # Collectors have their own page
+    if request.user.profile.role == "collector":
+        return redirect('/collector/')
+
+    requests_list = list(PickupRequest.objects.filter(user=request.user).order_by('-created_at'))
+
+    recycled = 0
+    completed = 0
+    for r in requests_list:
+        r.items = list(r.pickupitem_set.all())
+        r.weight = round(sum(item.weight_kg for item in r.items), 2)
+
+        # Real weight and amount after the collector finishes
+        if r.status == "completed":
+            r.real_weight = round(sum(item.real_weight_kg or 0 for item in r.items), 2)
+            r.amount = round(sum((item.real_weight_kg or 0) * item.price_per_kg for item in r.items), 2)
+            recycled += r.real_weight
+            completed += 1
+
+    # Split the saved phone "+970591234567" into "970" and "0591234567" for the form
+    phone = request.user.profile.phone
+    phone_code = phone[1:4] if phone.startswith('+') else "970"
+    phone_number = "0" + phone[4:] if phone.startswith('+') else phone
+
+    context = {
+        'requests_list': requests_list,
+        'recycled': round(recycled, 1),
+        'completed': completed,
+        'phone_code': phone_code,
+        'phone_number': phone_number,
+    }
+    return render(request, "my_requests.html", context)
+
+
+# Cancel a pending request
+@login_required(login_url='/login/')
+def cancel_request(request, id):
+    pickup_request = PickupRequest.objects.filter(id=id, user=request.user, status="pending").first()
+    if pickup_request is not None and request.method == "POST":
+        pickup_request.status = "cancelled"
+        pickup_request.save()
+        messages.success(request, "Request cancelled", extra_tags='requests')
+    return redirect('/my-requests/')
+
+
+# Rejected request: put the items back in the bag and choose another collector
+@login_required(login_url='/login/')
+def retry_request(request, id):
+    pickup_request = PickupRequest.objects.filter(id=id, user=request.user, status="rejected").first()
+    if pickup_request is None or request.method != "POST":
+        return redirect('/my-requests/')
+
+    for item in pickup_request.pickupitem_set.all():
+        BagItem.objects.create(
+            user=request.user,
+            material=item.material,
+            item_name=item.material.name,
+            quantity=1,
+            weight_kg=item.weight_kg,
+        )
+
+    pickup_request.delete()
+    return redirect('/pickup/')
+
+
+# Update the user's name, phone and email
+@login_required(login_url='/login/')
+def update_my_info(request):
+    if request.method != "POST":
+        return redirect('/my-requests/')
+
+    errors = {}
+    if len(request.POST['full_name']) < 2:
+        errors['full_name'] = "Name should be at least 2 characters"
+    if not EMAIL_REGEX.match(request.POST['email']):
+        errors['email'] = "Invalid email address"
+    elif User.objects.filter(username=request.POST['email']).exclude(id=request.user.id).exists():
+        errors['email'] = "Email already exists"
+    check_phone(request.POST, errors)
+
+    if errors:
+        for key, value in errors.items():
+            messages.error(request, value, extra_tags='info')
+        return redirect('/my-requests/')
+
+    user = request.user
+    user.first_name = request.POST['full_name']
+    user.email = request.POST['email']
+    user.username = request.POST['email']
+    user.save()
+
+    user.profile.phone = full_phone(request.POST)
+    user.profile.save()
+
+    messages.success(request, "Your info was saved", extra_tags='info')
+    return redirect('/my-requests/')
 
 
 # ----- Collector dashboard -----

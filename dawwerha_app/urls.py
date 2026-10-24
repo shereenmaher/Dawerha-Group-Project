@@ -22,6 +22,9 @@ urlpatterns = [
     # ===== Bara =====
     path("pickup/", views.pickup, name="pickup"),
     path("my-requests/", views.my_requests, name="my_requests"),
+    path("my-requests/<int:id>/cancel/", views.cancel_request, name="cancel_request"),
+    path("my-requests/<int:id>/retry/", views.retry_request, name="retry_request"),
+    path("my-requests/info/", views.update_my_info, name="update_my_info"),
     path("collector/", views.collector, name="collector"),
     path("collector/info/", views.collector_info, name="collector_info"),
     path("collector/prices/add/", views.add_price, name="add_price"),
