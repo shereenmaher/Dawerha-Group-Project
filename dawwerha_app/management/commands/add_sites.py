@@ -56,7 +56,7 @@ class Command(BaseCommand):
                 user=user,
                 defaults={
                     'role': "collector",
-                    'phone': "0590000000",
+                    'phone': "+970590000000",
                 },
             )
 
@@ -66,7 +66,7 @@ class Command(BaseCommand):
                 defaults={
                     'name': data['name'],
                     'kind': "point",
-                    'phone': "0590000000",
+                    'phone': "+970590000000",
                     'address': data['address'],
                     'lat': data['lat'],
                     'lng': data['lng'],

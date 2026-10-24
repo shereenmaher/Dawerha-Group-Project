@@ -189,7 +189,13 @@
                     </div>
                     <div class="col-md-3">
                         <label for="cPhone" class="form-label small fw-semibold">WhatsApp number</label>
-                        <input type="tel" class="form-control" id="cPhone" name="phone" placeholder="059xxxxxxx" required>
+                        <div class="input-group">
+                            <select class="form-select flex-grow-0 w-auto" id="cPhoneCode" name="phone_code" aria-label="Country code">
+                                <option value="970">+970</option>
+                                <option value="972">+972</option>
+                            </select>
+                            <input type="tel" class="form-control" id="cPhone" name="phone" placeholder="059xxxxxxx" required>
+                        </div>
                     </div>
                     <div class="col-md-3">
                         <label for="cCoverage" class="form-label small fw-semibold">Coverage area (km)</label>
