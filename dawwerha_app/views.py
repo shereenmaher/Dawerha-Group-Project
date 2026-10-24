@@ -4,15 +4,26 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, login_not_required
 from django.http import JsonResponse
-from .models import ContactMessage, Profile, Collector, Material, Scan, BagItem
+from django.db.models import Sum
+from .models import ContactMessage, Profile, Collector, Material, Scan, BagItem, PickupRequest, PickupItem
 from .ai import analyze_image
 
 
 # ===== Dina =====
-# Home page, open for everyone
+# Home page, open for everyone, with the site numbers
 @login_not_required
 def home(request):
-    return render(request, "home.html")
+    total_kg = PickupItem.objects.filter(
+        request__status="completed"
+    ).aggregate(Sum('real_weight_kg'))['real_weight_kg__sum'] or 0
+
+    context = {
+        'total_kg': round(total_kg, 1),
+        'collectors_count': Collector.objects.count(),
+        'pickups_count': PickupRequest.objects.filter(status="completed").count(),
+    }
+
+    return render(request, "home.html", context)
 
 
 # Login page, open for everyone

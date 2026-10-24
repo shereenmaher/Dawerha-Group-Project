@@ -17,7 +17,7 @@
                 <li class="nav-item"><a class="nav-link" href="#info">My info</a></li>
             </ul>
             <div class="d-flex align-items-center gap-2 text-white small">
-                <span class="bg-warning text-success rounded-circle px-2 py-1 fw-bold">[C]</span> [Collector name]
+                <span class="bg-warning text-success rounded-circle px-2 py-1 fw-bold">{{ user.collector.name|first|upper }}</span> {{ user.collector.name }}
                 <a href="{% url 'logout' %}" class="btn btn-warning btn-sm ms-2">Log out</a>
             </div>
         </div>

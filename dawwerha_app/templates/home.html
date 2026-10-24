@@ -5,8 +5,34 @@
 
 {% block content %}
 <!-- Hero -->
-<section class="text-white py-5" style="background: linear-gradient(90deg, rgba(20,83,45,.4), rgba(20,83,45,.95) 55%), url('{% static "img/hero.jpg" %}') center / cover, #14532d;">
-    <div class="container-fluid px-4">
+<section class="position-relative text-white py-5 overflow-hidden">
+
+    <!-- Photo slider (fills the whole section) -->
+    <div id="heroSlider" class="carousel slide carousel-fade position-absolute top-0 start-0 w-100 h-100 z-0" data-bs-ride="carousel">
+        <!-- Slider dots -->
+        <div class="carousel-indicators justify-content-start ms-4 mb-3">
+            <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Photo 1"></button>
+            <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="1" aria-label="Photo 2"></button>
+            <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="2" aria-label="Photo 3"></button>
+        </div>
+        <div class="carousel-inner h-100">
+            <div class="carousel-item h-100 active">
+                <img src="{% static 'img/slide1.jpg' %}" class="d-block w-100 h-100 object-fit-cover" alt="Waste piled up along a street">
+            </div>
+            <div class="carousel-item h-100">
+                <img src="{% static 'img/slide2.jpg' %}" class="d-block w-100 h-100 object-fit-cover" alt="Plastic waste on a street at night">
+            </div>
+            <div class="carousel-item h-100">
+                <img src="{% static 'img/slide3.jpg' %}" class="d-block w-100 h-100 object-fit-cover" alt="A landfill full of plastic waste">
+            </div>
+        </div>
+    </div>
+
+    <!-- Dark green cover behind the text: right half on big screens, full width on phones -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 d-none d-lg-block pe-none" style="background: linear-gradient(90deg, rgba(20, 83, 45, 0) 45%, rgba(20, 83, 45, .92) 50%);"></div>
+    <div class="position-absolute top-0 start-0 w-100 h-100 d-lg-none pe-none" style="background-color: rgba(20, 83, 45, .85);"></div>
+
+    <div class="container-fluid px-4 position-relative">
         <div class="row">
             <div class="col-lg-5 offset-lg-6 py-lg-5">
                 <span class="badge rounded-pill text-bg-warning mb-3">
@@ -41,7 +67,7 @@
                 <div class="card-body d-flex align-items-center gap-3">
                     <span class="bg-success-subtle text-success rounded-3 p-2 fs-4 lh-1"><i class="bi bi-tree"></i></span>
                     <div>
-                        <div class="fs-3 fw-bold text-success-emphasis lh-1">[000] kg</div>
+                        <div class="fs-3 fw-bold text-success-emphasis lh-1">{{ total_kg }} kg</div>
                         <div class="small text-body-secondary">recycled instead of dumped</div>
                     </div>
                 </div>
@@ -52,7 +78,7 @@
                 <div class="card-body d-flex align-items-center gap-3">
                     <span class="bg-info-subtle text-info-emphasis rounded-3 p-2 fs-4 lh-1"><i class="bi bi-geo-alt"></i></span>
                     <div>
-                        <div class="fs-3 fw-bold text-success-emphasis lh-1">[00]</div>
+                        <div class="fs-3 fw-bold text-success-emphasis lh-1">{{ collectors_count }}</div>
                         <div class="small text-body-secondary">collectors and recycling sites</div>
                     </div>
                 </div>
@@ -63,7 +89,7 @@
                 <div class="card-body d-flex align-items-center gap-3">
                     <span class="bg-warning-subtle text-warning-emphasis rounded-3 p-2 fs-4 lh-1"><i class="bi bi-truck"></i></span>
                     <div>
-                        <div class="fs-3 fw-bold text-success-emphasis lh-1">[000]</div>
+                        <div class="fs-3 fw-bold text-success-emphasis lh-1">{{ pickups_count }}</div>
                         <div class="small text-body-secondary">pickups completed</div>
                     </div>
                 </div>
