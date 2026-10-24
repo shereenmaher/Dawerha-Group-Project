@@ -263,12 +263,56 @@ def delete_bag_item(request, id):
 
     return redirect('/bag/')
 
-# Recycling sites page, with the bag count for the navbar button
+
+# Recycling sites page: the list of sites, the map data and the bag count
 @login_required(login_url='/login/')
 def sites(request):
+    site_list = list(
+        Collector.objects.filter(
+            kind="point"
+        ).prefetch_related(
+            'collectorprice_set__material'
+        )
+    )
+
+    # Data for the map: only sites that have a location
+    map_data = []
+
+    for site in site_list:
+        # The site's prices for recyclable materials,
+        # in the same order as the Material table
+        site.prices = [
+            price
+            for price in site.collectorprice_set.all()
+            if price.material.recyclable
+        ]
+
+        site.prices.sort(
+            key=lambda price: price.material.id
+        )
+
+        site.accepts = [
+            price.material.name
+            for price in site.prices
+        ]
+
+        if site.lat is not None and site.lng is not None:
+            map_data.append({
+                'id': site.id,
+                'name': site.name,
+                'address': site.address,
+                'hours': site.hours,
+                'accepts': site.accepts,
+                'lat': site.lat,
+                'lng': site.lng,
+            })
+
     context = {
         'items': BagItem.objects.filter(user=request.user),
+        'sites': site_list,
+        'map_data': map_data,
     }
+
     return render(request, "sites.html", context)
 
 
