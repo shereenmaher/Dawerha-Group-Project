@@ -1,12 +1,15 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Request a pickup{% endblock %}
 
 {% block navbar_right %}
-<a href="{% url 'bag' %}" class="btn btn-warning"><i class="bi bi-bag"></i> Recycling bag (3)</a>
+<a href="{% url 'bag' %}" class="btn btn-warning"><i class="bi bi-bag"></i> Recycling bag ({{ items|length }})</a>
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
 <div class="container py-4">
 
     <div class="d-flex align-items-center gap-3 mb-4">
@@ -17,57 +20,87 @@
         </div>
     </div>
 
-    <form method="post" novalidate>
+    <!-- Messages -->
+    {% for message in messages %}
+        <div class="alert alert-danger py-2">{{ message }}</div>
+    {% endfor %}
+
+    {% if not can_pickup %}
+    <!-- Bag is less than 5 kg -->
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-bag display-4 text-success"></i>
+            <h2 class="h4 fw-bold mt-3">Your bag has {{ total_weight }} kg</h2>
+            <p class="text-body-secondary">You need at least 5 kg in your bag to request a home pickup.</p>
+            <a href="{% url 'scan' %}" class="btn btn-warning"><i class="bi bi-camera"></i> Scan more items</a>
+            <a href="{% url 'sites' %}" class="btn btn-outline-success"><i class="bi bi-geo-alt"></i> Drop it off myself</a>
+        </div>
+    </div>
+    {% else %}
+
+    <form action="{% url 'pickup' %}" method="post" novalidate>
         {% csrf_token %}
+        <input type="hidden" name="lat" id="lat">
+        <input type="hidden" name="lng" id="lng">
+
         <div class="row g-3">
 
             <!-- Steps -->
             <div class="col-lg-8">
 
+                <!-- Step 1: address -->
                 <div class="card mb-3">
                     <div class="card-body p-4">
                         <h2 class="h5 fw-bold mb-3"><span class="badge rounded-pill text-bg-success me-1">1</span> Your address</h2>
-                        <div id="addressMap" class="bg-secondary-subtle rounded-3 border d-flex align-items-center justify-content-center text-body-secondary mb-3" style="height: 180px;">
-                            [Map: drag the pin to your home]
-                        </div>
-                        <button type="button" class="btn btn-warning btn-sm mb-3"><i class="bi bi-crosshair"></i> Use my current location</button>
+                        <div id="addressMap" class="rounded-3 border mb-3" style="height: 260px;"></div>
+                        <button type="button" id="myLocationBtn" class="btn btn-warning btn-sm mb-2"><i class="bi bi-crosshair"></i> Use my current location</button>
+                        <div id="locationMsg" class="small mb-3"></div>
                         <div>
                             <label for="address" class="form-label small fw-semibold">Address description</label>
-                            <input type="text" class="form-control" id="address" name="address" placeholder="Neighborhood, street, building, floor" required>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="Neighborhood, street, building, floor">
                         </div>
                     </div>
                 </div>
 
+                <!-- Step 2: collector -->
                 <div class="card mb-3">
                     <div class="card-body p-4">
-                        <h2 class="h5 fw-bold mb-2"><span class="badge rounded-pill text-bg-success me-1">2</span> Choose a collector from the map</h2>
-                        <p class="small text-body-secondary">The map shows collectors near your address. Click a collector to see their prices.</p>
+                        <h2 class="h5 fw-bold mb-2"><span class="badge rounded-pill text-bg-success me-1">2</span> Choose a collector</h2>
+                        <p class="small text-body-secondary">Compare the prices for the items in your bag, then choose one collector.</p>
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-5">
-                                <div class="card border-success border-2">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {% for c in collectors %}
+                                <label class="card mb-2" for="collector{{ c.info.id }}" style="cursor: pointer;">
                                     <div class="card-body">
-                                        <div class="fw-bold"><span class="badge rounded-pill text-bg-success me-1">1</span> [Collector 1 – demo]</div>
-                                        <div class="small text-body-secondary mb-2">[distance] km from you</div>
-                                        <div class="bg-success bg-opacity-10 rounded-3 p-2 small mb-2">
-                                            <div class="fw-semibold mb-1">Prices per kilo</div>
-                                            <div class="d-flex justify-content-between"><span>Plastic</span><strong>₪[price]</strong></div>
-                                            <div class="d-flex justify-content-between"><span>Cardboard</span><strong>₪[price]</strong></div>
-                                            <div class="d-flex justify-content-between"><span>Aluminium</span><strong>₪[price]</strong></div>
+                                        <div class="d-flex align-items-start gap-2">
+                                            <input class="form-check-input mt-1" type="radio" name="collector"
+                                                   id="collector{{ c.info.id }}" value="{{ c.info.id }}"
+                                                   data-name="{{ c.info.name }}" data-amount="{{ c.amount }}">
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold">{{ c.info.name }}</div>
+                                                <div class="small text-body-secondary mb-2">{{ c.info.address }} · {{ c.info.hours }}</div>
+                                                <div class="bg-success bg-opacity-10 rounded-3 p-2 small">
+                                                    {% for p in c.prices %}
+                                                    <div class="d-flex justify-content-between"><span>{{ p.material }}</span><strong>₪{{ p.price }} / kg</strong></div>
+                                                    {% empty %}
+                                                    <div>This collector doesn't buy these materials.</div>
+                                                    {% endfor %}
+                                                </div>
+                                                <div class="d-flex justify-content-between fw-bold small mt-2">
+                                                    <span>You get about</span><span class="text-success">₪{{ c.amount }}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <button type="button" class="btn btn-warning btn-sm w-100"><i class="bi bi-check-lg"></i> Choose this collector</button>
                                     </div>
-                                </div>
+                                </label>
+                                {% empty %}
+                                <div class="alert alert-warning">No collectors are available right now.</div>
+                                {% endfor %}
                             </div>
-                            <div class="col-md-7">
-                                <div id="collectorsMap" class="bg-secondary-subtle rounded-3 border d-flex align-items-center justify-content-center text-body-secondary h-100" style="min-height: 220px;">
-                                    [Map: your home + collectors 1, 2, 3]
-                                </div>
+                            <div class="col-md-6">
+                                <div id="collectorsMap" class="rounded-3 border h-100" style="min-height: 300px;"></div>
                             </div>
-                        </div>
-
-                        <div class="alert alert-success py-2 mb-0">
-                            <i class="bi bi-check-lg"></i> Selected collector: <strong>[Collector 1 – demo]</strong>
                         </div>
                     </div>
                 </div>
@@ -83,12 +116,15 @@
                         <div class="bg-success-subtle text-success rounded-3 text-center display-3 py-3 mb-3"><i class="bi bi-truck"></i></div>
                         <h2 class="h5 fw-bold">Request summary</h2>
                         <div class="d-flex justify-content-between border-bottom pb-2 mb-2 small">
-                            <span>Collector</span><strong>[Collector 1 – demo]</strong>
+                            <span>Collector</span><strong id="selectedCollector">Not chosen yet</strong>
                         </div>
-                        <div class="d-flex justify-content-between small"><span>Plastic</span><span>0.6 kg</span></div>
-                        <div class="d-flex justify-content-between small"><span>Cardboard</span><span>3 kg</span></div>
-                        <div class="d-flex justify-content-between small border-bottom pb-2 mb-2"><span>Aluminium</span><span>1.6 kg</span></div>
-                        <div class="d-flex justify-content-between fw-bold mb-3"><span>Estimated weight</span><span>5.2 kg</span></div>
+
+                        {% for material, weight in totals %}
+                        <div class="d-flex justify-content-between small"><span>{{ material.name }}</span><span>{{ weight|floatformat:2 }} kg</span></div>
+                        {% endfor %}
+
+                        <div class="d-flex justify-content-between fw-bold border-top pt-2 mt-2"><span>Estimated weight</span><span>{{ total_weight }} kg</span></div>
+                        <div class="d-flex justify-content-between fw-bold mb-3"><span>Expected amount</span><span class="text-success" id="selectedAmount">-</span></div>
 
                         <div class="alert alert-success small py-2"><i class="bi bi-cash"></i> Payment is cash from the collector, based on the real weight.</div>
                         <button type="submit" class="btn btn-warning w-100 mb-2">Send request</button>
@@ -99,5 +135,11 @@
 
         </div>
     </form>
+
+    {{ map_points|json_script:"mapPoints" }}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{% static 'js/places.js' %}"></script>
+    <script src="{% static 'js/pickup.js' %}"></script>
+    {% endif %}
 </div>
 {% endblock %}
