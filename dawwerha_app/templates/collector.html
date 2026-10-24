@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Collector dashboard{% endblock %}
 
@@ -12,12 +13,12 @@
         </button>
         <div class="collapse navbar-collapse" id="collectorNav">
             <ul class="navbar-nav mx-auto">
-                <li class="nav-item"><a class="nav-link active fw-bold" href="#requests">Requests</a></li>
+                <li class="nav-item"><a class="nav-link" href="#requests">Requests</a></li>
                 <li class="nav-item"><a class="nav-link" href="#prices">My prices</a></li>
                 <li class="nav-item"><a class="nav-link" href="#info">My info</a></li>
             </ul>
             <div class="d-flex align-items-center gap-2 text-white small">
-                <span class="bg-warning text-success rounded-circle px-2 py-1 fw-bold">{{ user.collector.name|first|upper }}</span> {{ user.collector.name }}
+                <span class="bg-warning text-success rounded-circle px-2 py-1 fw-bold">{{ me.name|first|upper }}</span> {{ me.name }}
                 <a href="{% url 'logout' %}" class="btn btn-warning btn-sm ms-2">Log out</a>
             </div>
         </div>
@@ -28,187 +29,247 @@
 {% block footer %}{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
 <div class="container-fluid px-4 py-4">
+    {% csrf_token %}
 
     <!-- Stats -->
     <div class="row g-3 mb-3">
         <div class="col-md-4">
             <div class="card h-100"><div class="card-body d-flex align-items-center gap-3">
                 <span class="bg-warning-subtle text-warning-emphasis rounded-3 p-2 fs-4 lh-1"><i class="bi bi-bell"></i></span>
-                <div><div class="small">New requests nearby</div><div class="fs-3 fw-bold lh-1">[0]</div></div>
+                <div><div class="small">New requests</div><div class="fs-3 fw-bold lh-1" id="newCount">{{ new_count }}</div></div>
             </div></div>
         </div>
         <div class="col-md-4">
             <div class="card h-100"><div class="card-body d-flex align-items-center gap-3">
                 <span class="bg-primary-subtle text-primary rounded-3 p-2 fs-4 lh-1"><i class="bi bi-calendar-check"></i></span>
-                <div><div class="small">Accepted today</div><div class="fs-3 fw-bold lh-1">[0]</div></div>
+                <div><div class="small">Accepted, waiting for pickup</div><div class="fs-3 fw-bold lh-1">{{ accepted_count }}</div></div>
             </div></div>
         </div>
         <div class="col-md-4">
             <div class="card h-100"><div class="card-body d-flex align-items-center gap-3">
                 <span class="bg-success-subtle text-success rounded-3 p-2 fs-4 lh-1"><i class="bi bi-speedometer2"></i></span>
-                <div><div class="small">Collected this month</div><div class="fs-3 fw-bold lh-1">[000] kg</div></div>
+                <div><div class="small">Collected this month</div><div class="fs-3 fw-bold lh-1">{{ collected }} kg</div></div>
             </div></div>
         </div>
     </div>
 
-    <!-- Requests -->
+    <!-- New requests -->
     <div class="card mb-3" id="requests">
         <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h4 fw-bold mb-0">New requests near you</h2>
-                <span class="small"><i class="bi bi-circle-fill text-success" style="font-size: .5rem;"></i> Updates live</span>
-            </div>
+            <h2 class="h4 fw-bold mb-3">New requests</h2>
+
+            {% for message in messages %}
+                {% if 'requests' in message.tags %}
+                    <div class="alert {% if 'success' in message.tags %}alert-success{% else %}alert-danger{% endif %} py-2">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+
+            <div id="requestError" class="alert alert-danger py-2 d-none"></div>
+
             <div class="table-responsive">
-                <table class="table align-middle mb-2">
+                <table class="table align-middle mb-0">
                     <thead class="table-light small">
-                        <tr><th>Area</th><th>Materials</th><th>Est. weight</th><th>Distance</th><th>Status</th><th></th></tr>
+                        <tr><th>Area</th><th>Materials</th><th>Est. weight</th><th>Sent</th><th></th></tr>
                     </thead>
                     <tbody class="small">
-                        <tr>
-                            <td>[Neighborhood]</td><td>Cardboard · Plastic · Aluminium</td><td>5.2 kg</td><td>[0] km</td>
-                            <td><span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">New</span></td>
+                        {% for r in new_requests %}
+                        <tr id="request{{ r.id }}">
+                            <td>{{ r.address }}</td>
+                            <td>{% for item in r.pickupitem_set.all %}{{ item.material.name }}{% if not forloop.last %} · {% endif %}{% endfor %}</td>
+                            <td>{% for item in r.pickupitem_set.all %}{{ item.weight_kg|floatformat:2 }} kg{% if not forloop.last %}<br>{% endif %}{% endfor %}</td>
+                            <td>{{ r.created_at|date:"d M, H:i" }}</td>
                             <td class="text-end text-nowrap">
-                                <button type="button" class="btn btn-warning btn-sm">Accept</button>
-                                <button type="button" class="btn btn-warning btn-sm">Reject</button>
+                                <button type="button" class="btn btn-warning btn-sm status-btn" data-id="{{ r.id }}" data-status="accepted">Accept</button>
+                                <button type="button" class="btn btn-outline-danger btn-sm status-btn" data-id="{{ r.id }}" data-status="rejected">Reject</button>
                             </td>
                         </tr>
-                        <tr>
-                            <td>[Neighborhood]</td><td>Iron · Copper</td><td>12 kg</td><td>[0] km</td>
-                            <td><span class="badge rounded-pill bg-warning-subtle text-warning-emphasis">New</span></td>
-                            <td class="text-end text-nowrap">
-                                <button type="button" class="btn btn-warning btn-sm">Accept</button>
-                                <button type="button" class="btn btn-warning btn-sm">Reject</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>[Neighborhood]</td><td>Cardboard</td><td>3 kg</td><td>[0] km</td>
-                            <td><span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">Accepted</span></td>
-                            <td class="text-end"><button type="button" class="btn btn-warning btn-sm"><i class="bi bi-check-lg"></i> Completed</button></td>
-                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center text-body-secondary py-3">No new requests right now.</td></tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
-            <p class="small text-body-secondary mb-0">[Accept and Reject update the request with Fetch, without reloading. Completed opens the weighing form below.]</p>
         </div>
     </div>
 
-    <div class="row g-3 mb-3">
-
-        <!-- Complete a pickup -->
-        <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-body p-4">
-                    <h2 class="h5 fw-bold mb-3">Complete a pickup</h2>
-                    <div class="d-flex gap-3 mb-3">
-                        <div class="bg-secondary-subtle rounded-3 border d-flex align-items-center justify-content-center text-success fs-2" style="width: 150px; height: 80px;"><i class="bi bi-geo-alt-fill"></i></div>
-                        <div>
-                            <div class="small mb-2">[User name] · [Address] · Payment: cash</div>
-                            <a href="#" class="btn btn-warning btn-sm"><i class="bi bi-whatsapp"></i> WhatsApp</a>
-                            <a href="#" class="btn btn-warning btn-sm"><i class="bi bi-sign-turn-right"></i> Directions</a>
-                        </div>
-                    </div>
-                    <form method="post" novalidate>
-                        {% csrf_token %}
-                        <div class="row g-2 mb-3">
-                            <div class="col-4">
-                                <label for="wCardboard" class="form-label small fw-semibold">Cardboard (kg)</label>
-                                <input type="number" step="0.1" min="0" class="form-control" id="wCardboard">
-                            </div>
-                            <div class="col-4">
-                                <label for="wPlastic" class="form-label small fw-semibold">Plastic (kg)</label>
-                                <input type="number" step="0.1" min="0" class="form-control" id="wPlastic">
-                            </div>
-                            <div class="col-4">
-                                <label for="wAluminium" class="form-label small fw-semibold">Aluminium (kg)</label>
-                                <input type="number" step="0.1" min="0" class="form-control" id="wAluminium">
-                            </div>
-                        </div>
-                        <div class="alert alert-success d-flex justify-content-between fw-bold py-2">
-                            <span>Amount to pay in cash</span><span>₪[000]</span>
-                        </div>
-                        <button type="submit" class="btn btn-warning w-100">Confirm pickup</button>
-                    </form>
+    <!-- Accepted requests: complete a pickup -->
+    {% for r in accepted_requests %}
+    <div class="card mb-3">
+        <div class="card-body p-4">
+            <h2 class="h5 fw-bold mb-3">Complete a pickup</h2>
+            <div class="mb-3">
+                <div class="small mb-2">
+                    <strong>{{ r.user.first_name }}</strong> · {{ r.address }} · Payment: cash
+                    {% if r.notes %}<br><span class="text-body-secondary">Notes: {{ r.notes }}</span>{% endif %}
                 </div>
+                <a href="https://wa.me/{{ r.user.profile.phone|slice:'1:' }}" target="_blank" class="btn btn-warning btn-sm"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+                {% if r.lat %}
+                <a href="https://www.google.com/maps/dir/?api=1&destination={{ r.lat }},{{ r.lng }}" target="_blank" class="btn btn-warning btn-sm"><i class="bi bi-sign-turn-right"></i> Directions</a>
+                {% endif %}
             </div>
+
+            <form action="{% url 'complete_request' r.id %}" method="post" class="complete-form" novalidate>
+                {% csrf_token %}
+                <div class="row g-2 mb-3">
+                    {% for item in r.pickupitem_set.all %}
+                    <div class="col-md-4">
+                        <label for="weight{{ item.id }}" class="form-label small fw-semibold">{{ item.material.name }} (kg) · ₪{{ item.price_per_kg }}/kg</label>
+                        <input type="number" step="0.01" min="0" class="form-control real-weight" id="weight{{ item.id }}"
+                               name="weight_{{ item.id }}" value="{{ item.weight_kg|floatformat:2 }}" data-price="{{ item.price_per_kg }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="alert alert-success d-flex justify-content-between fw-bold py-2">
+                    <span>Amount to pay in cash</span><span>₪<span class="amount">0</span></span>
+                </div>
+                <button type="submit" class="btn btn-warning w-100">Confirm pickup</button>
+            </form>
         </div>
+    </div>
+    {% endfor %}
+
+    <div class="row g-3 mb-3">
 
         <!-- My prices -->
         <div class="col-lg-6" id="prices">
             <div class="card h-100">
                 <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2 class="h5 fw-bold mb-0">My prices per kilo</h2>
-                        <button type="button" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i> Edit prices</button>
-                    </div>
+                    <h2 class="h5 fw-bold mb-3">My prices per kilo</h2>
+
+                    {% for message in messages %}
+                        {% if 'prices' in message.tags %}
+                            <div class="alert {% if 'success' in message.tags %}alert-success{% else %}alert-danger{% endif %} py-2">{{ message }}</div>
+                        {% endif %}
+                    {% endfor %}
+
                     <ul class="list-group list-group-flush mb-3">
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">Cardboard
-                            <span><strong>₪[price] / kg</strong> <button type="button" class="btn btn-outline-danger btn-sm ms-2" aria-label="Remove cardboard"><i class="bi bi-trash"></i></button></span></li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">PET plastic
-                            <span><strong>₪[price] / kg</strong> <button type="button" class="btn btn-outline-danger btn-sm ms-2" aria-label="Remove PET plastic"><i class="bi bi-trash"></i></button></span></li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">Aluminium
-                            <span><strong>₪[price] / kg</strong> <button type="button" class="btn btn-outline-danger btn-sm ms-2" aria-label="Remove aluminium"><i class="bi bi-trash"></i></button></span></li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">Copper
-                            <span><strong>₪[price] / kg</strong> <button type="button" class="btn btn-outline-danger btn-sm ms-2" aria-label="Remove copper"><i class="bi bi-trash"></i></button></span></li>
+                        {% for price in my_prices %}
+                        <li class="list-group-item px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>{{ price.material.name }} <span class="small text-body-secondary">(₪{{ price.material.min_price }} – ₪{{ price.material.max_price }})</span></span>
+                                <span class="d-flex align-items-center gap-2">
+                                    <strong>₪{{ price.price_per_kg }} / kg</strong>
+                                    <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="collapse"
+                                            data-bs-target="#editPrice{{ price.id }}" aria-label="Edit {{ price.material.name }}"><i class="bi bi-pencil"></i></button>
+                                    <form action="{% url 'delete_price' price.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" aria-label="Remove {{ price.material.name }}"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </span>
+                            </div>
+
+                            <!-- Edit price (opens when the pencil is clicked) -->
+                            <div class="collapse" id="editPrice{{ price.id }}">
+                                <form action="{% url 'add_price' %}" method="post" class="d-flex gap-2 mt-2" novalidate>
+                                    {% csrf_token %}
+                                    <input type="hidden" name="material" value="{{ price.material.id }}">
+                                    <input type="number" step="0.01" min="0" class="form-control form-control-sm" name="price"
+                                           value="{{ price.price_per_kg }}" aria-label="New price for {{ price.material.name }}">
+                                    <button type="submit" class="btn btn-warning btn-sm px-3">Save</button>
+                                </form>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item px-0 text-body-secondary">You didn't add any prices yet. Users can't choose you until you add prices.</li>
+                        {% endfor %}
                     </ul>
-                    <form method="post" class="bg-success bg-opacity-10 rounded-3 p-3" novalidate>
+
+                    {% if other_materials %}
+                    <form action="{% url 'add_price' %}" method="post" class="bg-success bg-opacity-10 rounded-3 p-3" novalidate>
                         {% csrf_token %}
                         <div class="fw-semibold small mb-2">Add a new material</div>
                         <div class="row g-2 mb-2">
                             <div class="col-6">
                                 <label for="newMaterial" class="form-label small fw-semibold">Material</label>
                                 <select class="form-select" id="newMaterial" name="material">
-                                    <option>Glass</option>
-                                    <option>Iron</option>
-                                    <option>Electronics</option>
+                                    {% for material in other_materials %}
+                                    <option value="{{ material.id }}">{{ material.name }} (₪{{ material.min_price }} – ₪{{ material.max_price }})</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="col-6">
                                 <label for="newPrice" class="form-label small fw-semibold">Price (₪/kg)</label>
-                                <input type="number" step="0.1" min="0" class="form-control" id="newPrice" name="price" required>
+                                <input type="number" step="0.01" min="0" class="form-control" id="newPrice" name="price">
                             </div>
                         </div>
                         <button type="submit" class="btn btn-warning w-100"><i class="bi bi-plus-lg"></i> Add material</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- My info -->
+        <div class="col-lg-6" id="info">
+            <div class="card h-100">
+                <div class="card-body p-4">
+                    <h2 class="h5 fw-bold mb-1"><i class="bi bi-person text-success"></i> My info</h2>
+                    <p class="small text-body-secondary">Users see your name, WhatsApp number and location on the pickup map.</p>
+
+                    {% for message in messages %}
+                        {% if 'info' in message.tags %}
+                            <div class="alert {% if 'success' in message.tags %}alert-success{% else %}alert-danger{% endif %} py-2">{{ message }}</div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <form action="{% url 'collector_info' %}" method="post" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="lat" id="lat" value="{{ me.lat|default_if_none:'' }}">
+                        <input type="hidden" name="lng" id="lng" value="{{ me.lng|default_if_none:'' }}">
+
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-6">
+                                <label for="cName" class="form-label small fw-semibold">Name</label>
+                                <input type="text" class="form-control" id="cName" name="name" value="{{ me.name }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cPhone" class="form-label small fw-semibold">WhatsApp number</label>
+                                <div class="input-group">
+                                    <select class="form-select flex-grow-0 w-auto" id="cPhoneCode" name="phone_code" aria-label="Country code">
+                                        <option value="970" {% if phone_code == '970' %}selected{% endif %}>+970</option>
+                                        <option value="972" {% if phone_code == '972' %}selected{% endif %}>+972</option>
+                                    </select>
+                                    <input type="tel" class="form-control" id="cPhone" name="phone" value="{{ phone_number }}" placeholder="059xxxxxxx">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cAddress" class="form-label small fw-semibold">Address</label>
+                                <input type="text" class="form-control" id="cAddress" name="address" value="{{ me.address }}" placeholder="Area, city">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cHours" class="form-label small fw-semibold">Working hours</label>
+                                <input type="text" class="form-control" id="cHours" name="hours" value="{{ me.hours }}" placeholder="Sat–Thu 8:00–5:00">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cCoverage" class="form-label small fw-semibold">Coverage area (km)</label>
+                                <input type="number" min="1" class="form-control" id="cCoverage" name="coverage_km" value="{{ me.coverage_km }}">
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="cAvailable" name="is_available" {% if me.is_available %}checked{% endif %}>
+                                    <label class="form-check-label small fw-semibold" for="cAvailable">I'm available for pickups</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <label class="form-label small fw-semibold">My location (drag the pin)</label>
+                        <div id="myMap" class="rounded-3 border mb-2" style="height: 220px;"></div>
+                        <button type="button" id="myLocationBtn" class="btn btn-outline-success btn-sm mb-2"><i class="bi bi-crosshair"></i> Use my current location</button>
+                        <div id="locationMsg" class="small mb-3"></div>
+
+                        <button type="submit" class="btn btn-warning w-100">Save changes</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- My info -->
-    <div class="card" id="info">
-        <div class="card-body p-4">
-            <h2 class="h5 fw-bold mb-1"><i class="bi bi-person text-success"></i> My info</h2>
-            <p class="small text-body-secondary">Users see your name, WhatsApp number and location on the pickup map.</p>
-            <form method="post" novalidate>
-                {% csrf_token %}
-                <div class="row g-3 align-items-end mb-3">
-                    <div class="col-md-3">
-                        <label for="cName" class="form-label small fw-semibold">Name</label>
-                        <input type="text" class="form-control" id="cName" name="name" value="[Collector name]" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="cPhone" class="form-label small fw-semibold">WhatsApp number</label>
-                        <div class="input-group">
-                            <select class="form-select flex-grow-0 w-auto" id="cPhoneCode" name="phone_code" aria-label="Country code">
-                                <option value="970">+970</option>
-                                <option value="972">+972</option>
-                            </select>
-                            <input type="tel" class="form-control" id="cPhone" name="phone" placeholder="059xxxxxxx" required>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="cCoverage" class="form-label small fw-semibold">Coverage area (km)</label>
-                        <input type="number" min="1" class="form-control" id="cCoverage" name="coverage_km" value="5">
-                    </div>
-                    <div class="col-md-3">
-                        <button type="button" class="btn btn-warning w-100"><i class="bi bi-crosshair"></i> Set my location on the map</button>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-warning">Save changes</button>
-            </form>
-        </div>
-    </div>
-
 </div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'js/places.js' %}"></script>
+<script src="{% static 'js/collector.js' %}"></script>
 {% endblock %}
