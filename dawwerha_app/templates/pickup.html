@@ -66,7 +66,7 @@
                 <div class="card mb-3">
                     <div class="card-body p-4">
                         <h2 class="h5 fw-bold mb-2"><span class="badge rounded-pill text-bg-success me-1">2</span> Choose a collector</h2>
-                        <p class="small text-body-secondary">Compare the prices for the items in your bag, then choose one collector.</p>
+                        <p class="small text-body-secondary">Compare the prices, then choose one collector. <i class="bi bi-bag-check text-success"></i> marks the materials in your bag.</p>
 
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -81,10 +81,15 @@
                                                 <div class="fw-bold">{{ c.info.name }}</div>
                                                 <div class="small text-body-secondary mb-2">{{ c.info.address }} · {{ c.info.hours }}</div>
                                                 <div class="bg-success bg-opacity-10 rounded-3 p-2 small">
+                                                    <div class="fw-semibold mb-1">Prices per kilo</div>
                                                     {% for p in c.prices %}
-                                                    <div class="d-flex justify-content-between"><span>{{ p.material }}</span><strong>₪{{ p.price }} / kg</strong></div>
+                                                    {% if p.in_bag %}
+                                                    <div class="d-flex justify-content-between fw-bold"><span><i class="bi bi-bag-check text-success"></i> {{ p.material }}</span><span>₪{{ p.price }}</span></div>
+                                                    {% else %}
+                                                    <div class="d-flex justify-content-between text-body-secondary"><span>{{ p.material }}</span><span>₪{{ p.price }}</span></div>
+                                                    {% endif %}
                                                     {% empty %}
-                                                    <div>This collector doesn't buy these materials.</div>
+                                                    <div>This collector didn't add prices yet.</div>
                                                     {% endfor %}
                                                 </div>
                                                 <div class="d-flex justify-content-between fw-bold small mt-2">
