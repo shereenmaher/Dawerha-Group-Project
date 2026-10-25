@@ -15,7 +15,11 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG") == "True"
 
-ALLOWED_HOSTS = []
+# The server IP or domain comes from the .env (comma separated)
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+
+# Needed for the forms to work on https
+CSRF_TRUSTED_ORIGINS = ["https://" + host for host in ALLOWED_HOSTS]
 
 
 # Application definition
@@ -108,6 +112,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 
 STATIC_URL = 'static/'
+
+# On the server, "collectstatic" puts all static files here for Nginx
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # Uploaded images
