@@ -31,6 +31,7 @@ urlpatterns = [
     path("collector/prices/<int:id>/delete/", views.delete_price, name="delete_price"),
     path("collector/requests/<int:id>/complete/", views.complete_request, name="complete_request"),
     path("api/requests/<int:id>/status/", views.api_request_status, name="api_request_status"),
+    path("api/updates/", views.api_updates, name="api_updates"),
     path("about/", views.about, name="about"),
     path("contact/", views.contact, name="contact"),
 ]
