@@ -707,6 +707,29 @@ def complete_request(request, id):
     return redirect('/collector/#requests')
 
 
+# Live updates (AJAX): the pages ask every few seconds if something changed.
+# It returns a short "key". When the key changes, the page reloads itself.
+@login_not_required
+def api_updates(request):
+    # Numbers on the Home page
+    completed = PickupRequest.objects.filter(status="completed").count()
+    key = f"done{completed}"
+
+    if request.user.is_authenticated:
+        # The collector sees the requests sent to him,
+        # the user sees his own requests
+        me = get_collector(request.user)
+        if me is not None:
+            my_list = PickupRequest.objects.filter(collector=me)
+        else:
+            my_list = PickupRequest.objects.filter(user=request.user)
+
+        for r in my_list.order_by('id'):
+            key += f"-{r.id}{r.status[0]}"
+
+    return JsonResponse({'key': key})
+
+
 @login_not_required
 def about(request):
     return render(request, "about.html")
